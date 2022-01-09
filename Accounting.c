@@ -230,49 +230,73 @@ void MainMenu()
     MainMenuChoice=getche();
     if(MainMenuChoice=='1')
         SubmitIncome();
+    else if(MainMenuChoice=='2')
+        SubmitExpense();
 }
 
 void SubmitIncome()
 {
     system("cls");
-    char Incomes_Directory[50],IncomeAmount[20],IncomeSource,SpecificSourceOfIncome[30],YearOfIncome[6],MonthOfIncome[4],DayOfIncome[4],IncomeDescription[120];
+    char AfterSubmitChoice,Incomes_Directory[50],IncomeAmount[20],IncomeSource,SpecificSourceOfIncome[30],YearOfIncome[6],MonthOfIncome[4],DayOfIncome[4],IncomeDescription[100];
     FILE *Incomes;
     strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
     strcat(Incomes_Directory,username);
     strcat(Incomes_Directory,".txt");
     Incomes=fopen(Incomes_Directory,"a");
-    printf("-----INCOME SUBMIT MENU-----\n\n\nEnter amount of income in Iranian RIAL currency: ");
+    printf("----- INCOME SUBMIT -----\n\n\nEnter amount of income in Iranian RIAL currency: ");
     gets(IncomeAmount);
     strcat(IncomeAmount,"\n");
     fputs(IncomeAmount,Incomes);
     printf("\n\n1) Salary\n2) Pocket Money\n3)Government Aid\n4)University Grant\n5) Bank Interest\n6) Loan\n7)Other\n\nPlease choose your source of income: ");
     IncomeSource=getche();
-    if(IncomeSource=='1')
-        fputs("Salary\n",Incomes);
-    else if(IncomeSource=='2')
-        fputs("Pocket Money\n",Incomes);
-         else if(IncomeSource=='3')
+    switch(IncomeSource)
+    {
+        case '1':
+        {
+            fputs("Salary\n",Incomes);
+            break;
+        }
+        case '2':
+        {
+            fputs("Pocket Money\n",Incomes);
+            break;
+        }
+        case '3':
+        {
             fputs("Government Aid\n",Incomes);
-              else if(IncomeSource=='4')
-                fputs("University Grant\n",Incomes);
-                   else if(IncomeSource=='5')
-                    fputs("Bank Interest\n",Incomes);
-                        else if(IncomeSource=='6')
-                            fputs("Loan\n",Incomes);
-                             else
-                             {
-                                 printf("\nPlease enter your source of income: ");
-                                 gets(SpecificSourceOfIncome);
-                                 strcat(SpecificSourceOfIncome,"\n");
-                                 fputs(SpecificSourceOfIncome,Incomes);
-                             }
+            break;
+        }
+        case '4':
+        {
+            fputs("University Grant\n",Incomes);
+            break;
+        }
+        case '5':
+        {
+            fputs("Bank Interest\n",Incomes);
+            break;
+        }
+        case '6':
+        {
+            fputs("Loan\n",Incomes);
+            break;
+        }
+        default:
+        {
+            printf("Please enter source of Income: ");
+            gets(SpecificSourceOfIncome);
+            strcat(SpecificSourceOfIncome,"\n");
+            fputs(SpecificSourceOfIncome,Incomes);
+        }
+
+    }
     printf("Please enter year of income in YYYY format: ");
     gets(YearOfIncome);
-    strcat(YearOfIncome,"//");
+    strcat(YearOfIncome,"/");
     fputs(YearOfIncome,Incomes);
     printf("Please enter month of income in MM format: ");
     gets(MonthOfIncome);
-    strcat(MonthOfIncome,"//");
+    strcat(MonthOfIncome,"/");
     fputs(MonthOfIncome,Incomes);
     printf("Please enter day of income in DD format: ");
     gets(DayOfIncome);
@@ -282,6 +306,102 @@ void SubmitIncome()
     gets(IncomeDescription);
     strcat(IncomeDescription,"\n");
     fputs(IncomeDescription,Incomes);
+    printf("\n\nEnter 1 to submit another income or any other button to return to main menu: ");
+    AfterSubmitChoice=getche();
+    if(AfterSubmitChoice=='1')
+        SubmitExpense();
+    else
+        MainMenu();
+}
+
+void SubmitExpense()
+{
+    system("cls");
+    char AfterSubmitChoice,Expenses_Directory[50],ExpenseAmount[20],ExpenseSubject,SpecificExpense[25],YearOfExpenditure[6],MonthOfExpenditure[4],DayOfExpenditure[4],ExpenseDescription[100];
+    FILE *Expenses;
+    strcpy(Expenses_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(Expenses_Directory,username);
+    strcat(Expenses_Directory,".txt");
+    Expenses=fopen(Expenses_Directory,"a");
+    printf("----- EXPENSE SUBMIT -----\n\n\nEnter amount of expenditure in Iranian RIAL currency: ");
+    gets(ExpenseAmount);
+    strcat(ExpenseAmount,"\n");
+    fputs(ExpenseAmount,Expenses);
+    printf("\n\n1) Healthcare\n2) Food\n3) Bills\n4) Education\n5) Transportation\n6) Clothing\n7) Charity\n8) Recreation\n9) Other\n\nPlease choose subject of expenditure: ");
+    ExpenseSubject=getche();
+    switch(ExpenseSubject)
+    {
+        case '1':
+        {
+            fputs("Healthcare\n",Expenses);
+            break;
+        }
+        case '2':
+        {
+            fputs("Food\n",Expenses);
+            break;
+        }
+        case '3':
+        {
+            fputs("Bills\n",Expenses);
+            break;
+        }
+        case '4':
+        {
+            fputs("Education\n",Expenses);
+            break;
+        }
+        case '5':
+        {
+            fputs("Transportation\n",Expenses);
+            break;
+        }
+        case '6':
+        {
+            fputs("Clothing\n",Expenses);
+            break;
+        }
+        case '7':
+        {
+            fputs("Charity\n",Expenses);
+            break;
+        }
+        case '8':
+        {
+            fputs("Recreation\n",Expenses);
+            break;
+        }
+        default:
+        {
+            printf("Please enter subject of expenditure: ");
+            gets(SpecificExpense);
+            strcat(SpecificExpense,"\n");
+            fputs(SpecificExpense,Expenses);
+        }
+    }
+    printf("Please enter year of expenditure in YYYY format: ");
+    gets(YearOfExpenditure);
+    strcat(YearOfExpenditure,"/");
+    fputs(YearOfExpenditure,Expenses);
+    printf("Please enter month of expenditure in MM format: ");
+    gets(MonthOfExpenditure);
+    strcat(MonthOfExpenditure,"/");
+    fputs(MonthOfExpenditure,Expenses);
+    printf("Please enter day of expenditure in DD format: ");
+    gets(DayOfExpenditure);
+    strcat(DayOfExpenditure,"\n");
+    fputs(DayOfExpenditure,Expenses);
+    printf("Please enter a short(one line) description: ");
+    gets(ExpenseDescription);
+    strcat(ExpenseDescription,"\n");
+    fputs(ExpenseDescription,Expenses);
+    fclose(Expenses);
+    printf("\n\nEnter 1 to submit another expense or any other button to return to main menu: ");
+    AfterSubmitChoice=getche();
+    if(AfterSubmitChoice=='1')
+        SubmitExpense();
+    else
+        MainMenu();
 }
 
 
