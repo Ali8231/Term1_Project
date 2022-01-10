@@ -27,11 +27,13 @@ int UserNameSearch();
 int LoginPassCheck(int password[]);
 void MainMenu();
 int ProfileIteration();
-
+void EnterPass(char *password);
+void SubmitExpense();
+void Reports();
 
 void main()
 {
-    printf("Welcome to Ali accounting software");
+    printf("Welcome to Ali Asiaee accounting software");
     sleep(2);
     EntranceMenu();
 }
@@ -40,12 +42,23 @@ void EntranceMenu()
 {
     system("cls");
     char EntranceMenuChoice;
-    printf("1) Signup\n2) Login\n3) Exit\n\nPlease enter a number from the list: ");
-    EntranceMenuChoice=getche();
+    int temp;
+    printf("-----  ENTRANCE MENU  -----\n\n\n1) Signup\n2) Login\n3) Exit\n");
+    do
+    {
+        EntranceMenuChoice=getch();
+        temp=EntranceMenuChoice - '0';
+    }while(temp<1 || temp>3);
     if(EntranceMenuChoice=='1')
         Signup();
     else if(EntranceMenuChoice=='2')
         Login();
+         else
+         {
+             printf("Thank you for using this program\nHope to see you again!");
+             sleep(2);
+             exit(1);
+         }
 }
 
 void Signup()
@@ -58,11 +71,9 @@ void Signup()
     rewind(profile);
     gets(name);
     strcat(name,"\n");
-    fputs(name,profile);
     printf("Enter your last name: ");
     gets(family);
     strcat(family,"\n");
-    fputs(family,profile);
     printf("Enter user name: ");
     gets(username);
     //do
@@ -84,9 +95,8 @@ void Signup()
     strcat(File_Directoy,".txt");
     UserExpense=fopen(File_Directoy,"w");
     strcat(username,"\n");
-    fputs(username,profile);
     printf("\n\nNotes about password:\n---Your password must be between 8 and 20 characters\n---Your password must include uppercase and lowercase letters,at least one\n number and one special character(@,*,#,...)\n\nEnter password: ");
-    gets(password);
+    EnterPass(password);
     //do
     //{
     //    PassCheck(password);
@@ -97,17 +107,16 @@ void Signup()
     //    }
     //}while(PassCheck==0);
     printf("Enter the password again: ");
-    gets(ConfirmPass);
+    EnterPass(ConfirmPass);
     do
     {
        if(strcmp(password,ConfirmPass)!=0)
        {
            printf("Password is not the same.\nPlease Enter the same password: ");
-           gets(ConfirmPass);
+           EnterPass(ConfirmPass);
        }
     }while(strcmp(password,ConfirmPass)!=0);
     strcat(password,"\n");
-    fputs(password,profile);
     printf("Enter your Melli number: ");
     gets(MelliNum);
     //do
@@ -120,7 +129,6 @@ void Signup()
     //    }
     //}while(MelliNumCheck==0);
     strcat(MelliNum,"\n");
-    fputs(MelliNum,profile);
     printf("Enter your phone number: ");
     gets(PhoneNum);
     //do
@@ -133,7 +141,6 @@ void Signup()
     //    }
     //}while(PhoneNumCheck==0);
     strcat(PhoneNum,"\n");
-    fputs(PhoneNum,profile);
     printf("Enter your Email address: ");
     gets(Email);
     //do
@@ -146,8 +153,38 @@ void Signup()
     //    }
     //}while(EmailCheck==0);
     strcat(Email,"\n");
+    fputs(name,profile);
+    fputs(family,profile);
+    fputs(username,profile);
+    fputs(password,profile);
+    fputs(MelliNum,profile);
+    fputs(PhoneNum,profile);
     fputs(Email,profile);
     fclose(UserIncome);
+    system("cls");
+    printf("  User added Successfully");
+    EntranceMenu();
+}
+
+void EnterPass(char *password)
+{
+    char temp;
+    int i=0;
+    while((temp=getch())!=13)
+    {
+        if(i<0)
+            i++;
+        if(temp==8)
+        {
+            printf("\b \b");
+            i--;
+            continue;
+        }
+        password[i]=temp;
+        putch('*');
+        i++;
+    }
+    password[i]='\0';
 }
 
 
@@ -168,14 +205,14 @@ void Login()
         }
     }while(UserNameFound==-1);
     printf("Enter your password: ");
-    gets(password);
+    EnterPass(password);
     do
     {
         PassFound=LoginPassCheck(password);
         if(PassFound==-1)
         {
             printf("Password is not correct.\nPlease enter password again: ");
-            gets(password);
+            EnterPass(password);
         }
     }while(PassFound==-1);
     MainMenu();
@@ -226,18 +263,40 @@ void MainMenu()
 {
     system("cls");
     char MainMenuChoice;
-    printf("-----MAIN MENU-----\n\n\n1) Submit Income\n2) Submit Expenses\n3) Reports\n4) Settings\n5) Logout\n6) Exit\n\nPlease enter a number: ");
-    MainMenuChoice=getche();
-    if(MainMenuChoice=='1')
-        SubmitIncome();
-    else if(MainMenuChoice=='2')
-        SubmitExpense();
+    int temp;
+    printf("-----MAIN MENU-----\n\n\n1) Submit Income\n2) Submit Expenses\n3) Reports\n4) Settings\n5) Logout\n6) Exit\n");
+    do
+    {
+        MainMenuChoice=getch();
+        temp=MainMenuChoice - '0';
+    }while(temp<1 || temp>6);
+
+    switch(MainMenuChoice)
+    {
+        case '1':
+        {
+            SubmitIncome();
+            break;
+        }
+        case '2':
+        {
+            SubmitExpense();
+            break;
+        }
+        case '3':
+        {
+            Reports();
+            break;
+        }
+
+    }
 }
 
 void SubmitIncome()
 {
     system("cls");
-    char AfterSubmitChoice,Incomes_Directory[50],IncomeAmount[20],IncomeSource,SpecificSourceOfIncome[30],YearOfIncome[6],MonthOfIncome[4],DayOfIncome[4],IncomeDescription[100];
+    char AfterSubmitChoice,Incomes_Directory[50],IncomeAmount[20],ChooseSource,SourceOfIncome[30],YearOfIncome[6],MonthOfIncome[4],DayOfIncome[4],IncomeDescription[100];
+    int temp;
     FILE *Incomes;
     strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
     strcat(Incomes_Directory,username);
@@ -246,66 +305,72 @@ void SubmitIncome()
     printf("----- INCOME SUBMIT -----\n\n\nEnter amount of income in Iranian RIAL currency: ");
     gets(IncomeAmount);
     strcat(IncomeAmount,"\n");
-    fputs(IncomeAmount,Incomes);
-    printf("\n\n1) Salary\n2) Pocket Money\n3)Government Aid\n4)University Grant\n5) Bank Interest\n6) Loan\n7)Other\n\nPlease choose your source of income: ");
-    IncomeSource=getche();
-    switch(IncomeSource)
+    printf("\n\n1) Salary\n2) Pocket Money\n3)Government Aid\n4)University Grant\n5) Bank Interest\n6) Loan\n7)Other\n");
+    do
+    {
+        ChooseSource=getch();
+        temp=ChooseSource - '0';
+    }while(temp<1 || temp>7);
+
+    switch(ChooseSource)
     {
         case '1':
         {
-            fputs("Salary\n",Incomes);
+            strcpy(SourceOfIncome,"Salary\n");
             break;
         }
         case '2':
         {
-            fputs("Pocket Money\n",Incomes);
+            strcpy(SourceOfIncome,"Pocket Money\n");
             break;
         }
         case '3':
         {
-            fputs("Government Aid\n",Incomes);
+            strcpy(SourceOfIncome,"Government Aid\n");
             break;
         }
         case '4':
         {
-            fputs("University Grant\n",Incomes);
+            strcpy(SourceOfIncome,"University Grant\n");
             break;
         }
         case '5':
         {
-            fputs("Bank Interest\n",Incomes);
+            strcpy(SourceOfIncome,"Bank Interest\n");
             break;
         }
         case '6':
         {
-            fputs("Loan\n",Incomes);
+            strcpy(SourceOfIncome,"Loan\n");
             break;
         }
         default:
         {
             printf("Please enter source of Income: ");
-            gets(SpecificSourceOfIncome);
-            strcat(SpecificSourceOfIncome,"\n");
-            fputs(SpecificSourceOfIncome,Incomes);
+            gets(SourceOfIncome);
+            strcat(SourceOfIncome,"\n");
         }
 
     }
     printf("Please enter year of income in YYYY format: ");
     gets(YearOfIncome);
     strcat(YearOfIncome,"/");
-    fputs(YearOfIncome,Incomes);
     printf("Please enter month of income in MM format: ");
     gets(MonthOfIncome);
     strcat(MonthOfIncome,"/");
-    fputs(MonthOfIncome,Incomes);
     printf("Please enter day of income in DD format: ");
     gets(DayOfIncome);
     strcat(DayOfIncome,"\n");
-    fputs(DayOfIncome,Incomes);
     printf("Please enter a short(one line) description: ");
     gets(IncomeDescription);
     strcat(IncomeDescription,"\n");
+    fputs(IncomeAmount,Incomes);
+    fputs(SourceOfIncome,Incomes);
+    fputs(YearOfIncome,Incomes);
+    fputs(MonthOfIncome,Incomes);
+    fputs(DayOfIncome,Incomes);
     fputs(IncomeDescription,Incomes);
+    fclose(Incomes);
     printf("\n\nEnter 1 to submit another income or any other button to return to main menu: ");
     AfterSubmitChoice=getche();
     if(AfterSubmitChoice=='1')
@@ -317,7 +382,8 @@ void SubmitIncome()
 void SubmitExpense()
 {
     system("cls");
-    char AfterSubmitChoice,Expenses_Directory[50],ExpenseAmount[20],ExpenseSubject,SpecificExpense[25],YearOfExpenditure[6],MonthOfExpenditure[4],DayOfExpenditure[4],ExpenseDescription[100];
+    char AfterSubmitChoice,Expenses_Directory[50],ExpenseAmount[20],ChooseSubject,SubjectOfExpense[30],YearOfExpenditure[6],MonthOfExpenditure[4],DayOfExpenditure[4],ExpenseDescription[100];
+    int temp;
     FILE *Expenses;
     strcpy(Expenses_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
     strcat(Expenses_Directory,username);
@@ -326,74 +392,79 @@ void SubmitExpense()
     printf("----- EXPENSE SUBMIT -----\n\n\nEnter amount of expenditure in Iranian RIAL currency: ");
     gets(ExpenseAmount);
     strcat(ExpenseAmount,"\n");
-    fputs(ExpenseAmount,Expenses);
-    printf("\n\n1) Healthcare\n2) Food\n3) Bills\n4) Education\n5) Transportation\n6) Clothing\n7) Charity\n8) Recreation\n9) Other\n\nPlease choose subject of expenditure: ");
-    ExpenseSubject=getche();
-    switch(ExpenseSubject)
+    printf("\n\n1) Healthcare\n2) Food\n3) Bills\n4) Education\n5) Transportation\n6) Clothing\n7) Charity\n8) Recreation\n9) Other\n");
+    do
+    {
+        ChooseSubject=getch();
+        temp=ChooseSubject - '0';
+    }while(temp<1 || temp>9);
+
+    switch(ChooseSubject)
     {
         case '1':
         {
-            fputs("Healthcare\n",Expenses);
+            strcpy(SubjectOfExpense,"Healthcare\n");
             break;
         }
         case '2':
         {
-            fputs("Food\n",Expenses);
+            strcpy(SubjectOfExpense,"Food\n");
             break;
         }
         case '3':
         {
-            fputs("Bills\n",Expenses);
+            strcpy(SubjectOfExpense,"Bills\n");
             break;
         }
         case '4':
         {
-            fputs("Education\n",Expenses);
+            strcpy(SubjectOfExpense,"Education\n");
             break;
         }
         case '5':
         {
-            fputs("Transportation\n",Expenses);
+            strcpy(SubjectOfExpense,"Transportation\n");
             break;
         }
         case '6':
         {
-            fputs("Clothing\n",Expenses);
+            strcpy(SubjectOfExpense,"Clothing\n");
             break;
         }
         case '7':
         {
-            fputs("Charity\n",Expenses);
+            strcpy(SubjectOfExpense,"Charity\n");
             break;
         }
         case '8':
         {
-            fputs("Recreation\n",Expenses);
+            strcpy(SubjectOfExpense,"Recreation\n");
             break;
         }
         default:
         {
             printf("Please enter subject of expenditure: ");
-            gets(SpecificExpense);
-            strcat(SpecificExpense,"\n");
-            fputs(SpecificExpense,Expenses);
+            gets(SubjectOfExpense);
+            strcat(SubjectOfExpense,"\n");
         }
     }
     printf("Please enter year of expenditure in YYYY format: ");
     gets(YearOfExpenditure);
     strcat(YearOfExpenditure,"/");
-    fputs(YearOfExpenditure,Expenses);
     printf("Please enter month of expenditure in MM format: ");
     gets(MonthOfExpenditure);
     strcat(MonthOfExpenditure,"/");
-    fputs(MonthOfExpenditure,Expenses);
     printf("Please enter day of expenditure in DD format: ");
     gets(DayOfExpenditure);
     strcat(DayOfExpenditure,"\n");
-    fputs(DayOfExpenditure,Expenses);
     printf("Please enter a short(one line) description: ");
     gets(ExpenseDescription);
     strcat(ExpenseDescription,"\n");
+    fputs(ExpenseAmount,Expenses);
+    fputs(SubjectOfExpense,Expenses);
+    fputs(YearOfExpenditure,Expenses);
+    fputs(MonthOfExpenditure,Expenses);
+    fputs(DayOfExpenditure,Expenses);
     fputs(ExpenseDescription,Expenses);
     fclose(Expenses);
     printf("\n\nEnter 1 to submit another expense or any other button to return to main menu: ");
@@ -402,6 +473,19 @@ void SubmitExpense()
         SubmitExpense();
     else
         MainMenu();
+}
+
+void Reports()
+{
+    system("cls");
+    char ReportTypeChoice;
+    int temp;
+    printf("-----  REPORTS MENU  -----\n\n\n1) Account balance\n2) Incomes Reports\n3) Expenses Reports\n");
+    do
+    {
+        ReportTypeChoice=getch();
+        temp=ReportTypeChoice - '0';
+    }while(temp<1 || temp>3);
 }
 
 
