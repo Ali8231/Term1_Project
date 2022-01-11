@@ -1,0 +1,8 @@
+5000000
+Healthcare
+1395/4/1
+
+10000000
+Car
+1392/7/15
+Fixed gearbox

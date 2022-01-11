@@ -6,16 +6,36 @@
 #include<time.h>
 
 struct UserProfile
-    {
-        char name[30];
-        char family[30];
-        char user_name[30];
-        char password[30];
-        char MelliNum[20];
-        char PhoneNum[20];
-        char Email[50];
-        struct Userprofile *next;
-    };
+{
+    char name[30];
+    char family[30];
+    char user_name[30];
+    char password[30];
+    char MelliNum[20];
+    char PhoneNum[20];
+    char Email[50];
+    struct Userprofile *next;
+};
+
+
+struct UserIncome
+{
+   char amount[25];
+   char source[35];
+   char date[15];
+   char description[110];
+   struct UserIncome *next;
+};
+
+struct UserExpense
+{
+   char amount[25];
+   char source[35];
+   char date[15];
+   char description[110];
+   struct UserExpense *next;
+};
+
 
 char username[20];
 
@@ -64,7 +84,7 @@ void EntranceMenu()
 void Signup()
 {
     system("cls");
-    char File_Directoy[80],name[20],family[25],password[21],ConfirmPass[21],MelliNum[11],PhoneNum[12],Email[35];
+    char File_Directoy[70],name[20],family[25],password[21],ConfirmPass[21],MelliNum[12],PhoneNum[13],Email[40];
     FILE *profile,*UserIncome,*UserExpense;
     profile=fopen("profile.txt","a");
     printf("-----SIGN UP PAGE-----\n\n\nEnter your first name: ");
@@ -106,18 +126,18 @@ void Signup()
     //        gets(password);
     //    }
     //}while(PassCheck==0);
-    printf("Enter the password again: ");
+    printf("\nEnter the password again: ");
     EnterPass(ConfirmPass);
     do
     {
        if(strcmp(password,ConfirmPass)!=0)
        {
-           printf("Password is not the same.\nPlease Enter the same password: ");
+           printf("\nPassword is not the same.\nPlease Enter the same password: ");
            EnterPass(ConfirmPass);
        }
     }while(strcmp(password,ConfirmPass)!=0);
     strcat(password,"\n");
-    printf("Enter your Melli number: ");
+    printf("\nEnter your Melli number: ");
     gets(MelliNum);
     //do
     //  {
@@ -163,6 +183,7 @@ void Signup()
     fclose(UserIncome);
     system("cls");
     printf("  User added Successfully");
+    sleep(1);
     EntranceMenu();
 }
 
@@ -228,7 +249,7 @@ int UserNameSearch()
     temp=head;
     strcpy(temp_Username,username);
     strcat(temp_Username,"\n");
-    while(temp!=NULL)
+    while(temp->next!=NULL)
     {
         if(strcmp(temp->user_name,temp_Username)==0)
             return 0;
@@ -249,7 +270,7 @@ int LoginPassCheck(int password[])
     strcpy(temp_Password,password);
     strcat(temp_Username,"\n");
     strcat(temp_Password,"\n");
-    while(temp!=NULL)
+    while(temp->next!=NULL)
     {
         if((strcmp(temp_Username,temp->user_name)==0) && (strcmp(temp_Password,temp->password)==0))
             return 0;
@@ -305,7 +326,7 @@ void SubmitIncome()
     printf("----- INCOME SUBMIT -----\n\n\nEnter amount of income in Iranian RIAL currency: ");
     gets(IncomeAmount);
     strcat(IncomeAmount,"\n");
-    printf("\n\n1) Salary\n2) Pocket Money\n3)Government Aid\n4)University Grant\n5) Bank Interest\n6) Loan\n7)Other\n");
+    printf("\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7)Other\n");
     do
     {
         ChooseSource=getch();
@@ -371,10 +392,19 @@ void SubmitIncome()
     fputs(DayOfIncome,Incomes);
     fputs(IncomeDescription,Incomes);
     fclose(Incomes);
-    printf("\n\nEnter 1 to submit another income or any other button to return to main menu: ");
-    AfterSubmitChoice=getche();
+    system("cls");
+    printf("Income submitted successfully");
+    sleep(1);
+    system("cls");
+    printf("\n1) Submit another income\n2) Return to main menu\n");
+    do
+    {
+        AfterSubmitChoice=getch();
+        temp=AfterSubmitChoice-'0';
+    }while(temp!=1 && temp!=2);
+
     if(AfterSubmitChoice=='1')
-        SubmitExpense();
+        SubmitIncome();
     else
         MainMenu();
 }
@@ -467,8 +497,17 @@ void SubmitExpense()
     fputs(DayOfExpenditure,Expenses);
     fputs(ExpenseDescription,Expenses);
     fclose(Expenses);
-    printf("\n\nEnter 1 to submit another expense or any other button to return to main menu: ");
-    AfterSubmitChoice=getche();
+    system("cls");
+    printf("Expense submitted successfully");
+    sleep(1);
+    system("cls");
+    printf("\n1) Submit another expense\n2) Return to main menu\n");
+    do
+    {
+        AfterSubmitChoice=getch();
+        temp=AfterSubmitChoice-'0';
+    }while(temp!=1 && temp!=2);
+
     if(AfterSubmitChoice=='1')
         SubmitExpense();
     else
@@ -486,6 +525,48 @@ void Reports()
         ReportTypeChoice=getch();
         temp=ReportTypeChoice - '0';
     }while(temp<1 || temp>3);
+    if(ReportTypeChoice=='1')
+        AccountBalance();
+}
+
+void AccountBalance()
+{
+    system("cls");
+    long long int IncomeCount=0,ExpenseCount=0,Balance=0;
+    int temp;
+    char MenuChoose;
+    struct UserIncome *IncomeHead,*IncomeTemp;
+    struct UserExpense *ExpenseHead, *ExpenseTemp;
+    IncomeHead=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    ExpenseHead=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    IncomeHead=IncomeIteration();
+    ExpenseHead=ExpenseIteration();
+    IncomeTemp=IncomeHead;
+    ExpenseTemp=ExpenseHead;
+    while(IncomeTemp->next!=NULL)
+    {
+        IncomeCount+=atoi(IncomeTemp->amount);
+        IncomeTemp=IncomeTemp->next;
+    }
+    while(ExpenseTemp->next!=NULL)
+    {
+        ExpenseCount+=atoi(ExpenseTemp->amount);
+        ExpenseTemp=ExpenseTemp->next;
+    }
+    Balance=IncomeCount-ExpenseCount;
+    printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
+    getch();
+    system("cls");
+    printf("1) Reports menu\n2) Main menu");
+    do
+    {
+        MenuChoose=getch();
+        temp=MenuChoose-'0';
+    }while(temp!=1 && temp!=2);
+    if(MenuChoose=='1')
+        Reports();
+    else
+        MainMenu();
 }
 
 
@@ -525,6 +606,81 @@ void Reports()
         temp=user;
     }
     fclose(profile);
+    return head;
+}
+
+int IncomeIteration()
+{
+    struct UserIncome *head,*income,*temp;
+    char Incomes_Directory[70];
+    FILE *Incomes;
+    strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(Incomes_Directory,username);
+    strcat(Incomes_Directory,".txt");
+    Incomes=fopen(Incomes_Directory,"r");
+    do
+    {
+        head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    }while(head==NULL);
+    fgets(head->amount,sizeof head->amount,Incomes);
+    fgets(head->source,sizeof head->source,Incomes);
+    fgets(head->date,sizeof head->date,Incomes);
+    fgets(head->description,sizeof head->description,Incomes);
+    head->next=NULL;
+    temp=head;
+    while(feof(Incomes)==0)
+    {
+        do
+        {
+            income=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+        }while(income==NULL);
+        fgets(income->amount,sizeof income->amount,Incomes);
+        fgets(income->source,sizeof income->source,Incomes);
+        fgets(income->date,sizeof income->date,Incomes);
+        fgets(income->description,sizeof income->description,Incomes);
+        income->next=NULL;
+        temp->next=income;
+        temp=income;
+    }
+    fclose(Incomes);
+    return head;
+}
+
+
+int ExpenseIteration()
+{
+    struct UserExpense *head,*expense,*temp;
+    char Expense_Directory[70];
+    FILE *Expenses;
+    strcpy(Expense_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(Expense_Directory,username);
+    strcat(Expense_Directory,".txt");
+    Expenses=fopen(Expense_Directory,"r");
+    do
+    {
+        head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    }while(head==NULL);
+    fgets(head->amount,sizeof head->amount,Expenses);
+    fgets(head->source,sizeof head->source,Expenses);
+    fgets(head->date,sizeof head->date,Expenses);
+    fgets(head->description,sizeof head->description,Expenses);
+    head->next=NULL;
+    temp=head;
+    while(feof(Expenses)==0)
+    {
+        do
+        {
+            expense=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+        }while(expense==NULL);
+        fgets(expense->amount,sizeof expense->amount,Expenses);
+        fgets(expense->source,sizeof expense->source,Expenses);
+        fgets(expense->date,sizeof expense->date,Expenses);
+        fgets(expense->description,sizeof expense->description,Expenses);
+        expense->next=NULL;
+        temp->next=expense;
+        temp=expense;
+    }
+    fclose(Expenses);
     return head;
 }
 
