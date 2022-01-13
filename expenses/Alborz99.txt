@@ -1,0 +1,18 @@
+95000000
+Clothing
+1399
+5
+1
+Coat and trousers
+500000
+Charity
+1400
+6
+7
+
+1000000
+Car fix
+1400
+9
+9
+

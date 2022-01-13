@@ -22,7 +22,9 @@ struct UserIncome
 {
    char amount[25];
    char source[35];
-   char date[15];
+   char Year[7];
+   char Month[5];
+   char Day[5];
    char description[110];
    struct UserIncome *next;
 };
@@ -31,7 +33,9 @@ struct UserExpense
 {
    char amount[25];
    char source[35];
-   char date[15];
+   char Year[7];
+   char Month[5];
+   char Day[5];
    char description[110];
    struct UserExpense *next;
 };
@@ -74,17 +78,21 @@ void EntranceMenu()
     else if(EntranceMenuChoice=='2')
         Login();
          else
-         {
-             printf("Thank you for using this program\nHope to see you again!");
-             sleep(2);
-             exit(1);
-         }
+             Exit();
+}
+
+void Exit()
+{
+    system("cls");
+    printf("Thank you for using this program\nHope to see you again soon!");
+    sleep(2);
+    exit(1);
 }
 
 void Signup()
 {
     system("cls");
-    char File_Directoy[70],name[20],family[25],password[21],ConfirmPass[21],MelliNum[12],PhoneNum[13],Email[40];
+    char name[20],family[25],password[21],ConfirmPass[21],MelliNum[12],PhoneNum[13],Email[40];
     FILE *profile,*UserIncome,*UserExpense;
     profile=fopen("profile.txt","a");
     printf("-----SIGN UP PAGE-----\n\n\nEnter your first name: ");
@@ -106,14 +114,6 @@ void Signup()
     //    }
     //}while(UserNameCheck==0);
     printf("\n");
-    strcpy(File_Directoy,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
-    strcat(File_Directoy,username);
-    strcat(File_Directoy,".txt");
-    UserIncome=fopen(File_Directoy,"w");
-    strcpy(File_Directoy,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
-    strcat(File_Directoy,username);
-    strcat(File_Directoy,".txt");
-    UserExpense=fopen(File_Directoy,"w");
     strcat(username,"\n");
     printf("\n\nNotes about password:\n---Your password must be between 8 and 20 characters\n---Your password must include uppercase and lowercase letters,at least one\n number and one special character(@,*,#,...)\n\nEnter password: ");
     EnterPass(password);
@@ -180,7 +180,7 @@ void Signup()
     fputs(MelliNum,profile);
     fputs(PhoneNum,profile);
     fputs(Email,profile);
-    fclose(UserIncome);
+    fclose(profile);
     system("cls");
     printf("  User added Successfully");
     sleep(1);
@@ -375,11 +375,11 @@ void SubmitIncome()
     }
     printf("Please enter year of income in YYYY format: ");
     gets(YearOfIncome);
-    strcat(YearOfIncome,"/");
-    printf("Please enter month of income in MM format: ");
+    strcat(YearOfIncome,"\n");
+    printf("Please enter month of income in MM format(without zero): ");
     gets(MonthOfIncome);
-    strcat(MonthOfIncome,"/");
-    printf("Please enter day of income in DD format: ");
+    strcat(MonthOfIncome,"\n");
+    printf("Please enter day of income in DD format(without zero): ");
     gets(DayOfIncome);
     strcat(DayOfIncome,"\n");
     printf("Please enter a short(one line) description: ");
@@ -480,11 +480,11 @@ void SubmitExpense()
     }
     printf("Please enter year of expenditure in YYYY format: ");
     gets(YearOfExpenditure);
-    strcat(YearOfExpenditure,"/");
-    printf("Please enter month of expenditure in MM format: ");
+    strcat(YearOfExpenditure,"\n");
+    printf("Please enter month of expenditure in MM format(without zero): ");
     gets(MonthOfExpenditure);
-    strcat(MonthOfExpenditure,"/");
-    printf("Please enter day of expenditure in DD format: ");
+    strcat(MonthOfExpenditure,"\n");
+    printf("Please enter day of expenditure in DD format(without zero): ");
     gets(DayOfExpenditure);
     strcat(DayOfExpenditure,"\n");
     printf("Please enter a short(one line) description: ");
@@ -527,7 +527,120 @@ void Reports()
     }while(temp<1 || temp>3);
     if(ReportTypeChoice=='1')
         AccountBalance();
+    else if(ReportTypeChoice=='2')
+        IncomeReports();
 }
+
+void IncomeReports()
+{
+    system("cls");
+    char IncomeReportType;
+    int temp;
+    printf("-----  INCOME REPORTS  -----\n\n\n1) Yearly incomes\n2) Incomes in a timespan\n3) Specific income in a timespan\n4) Incomes share ratio\n5) Minor incomes\n6) Highest income in a timespan\n7) Search in descriptions");
+    do
+    {
+        IncomeReportType=getch();
+        temp=IncomeReportType-'0';
+    }while(temp<1 || temp>7);
+    switch(IncomeReportType)
+    {
+        case '1':
+        {
+            YearlyIncome();
+            break;
+        }
+        case '2':
+        {
+            IncomeInTimespan();
+            break;
+        }
+
+    }
+}
+
+void IncomeInTimespan()
+{
+   system("cls");
+   struct UserIncome *head,*IncomeTemp;
+   char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4],MenuChoose;
+   long long int IncomeCount=0;
+   int temp;
+   head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+   head=IncomeIteration();
+   IncomeTemp=head;
+   printf("Enter beginning year in YYYY format: ");
+   gets(BeginYear);
+   printf("Enter beginning month in MM format(without zero): ");
+   gets(BeginMonth);
+   printf("Enter beginning day in DD format(without zero): ");
+   gets(BeginDay);
+   printf("\n\nEnter ending year in YYYY format: ");
+   gets(EndYear);
+   printf("\n\nEnter ending month in MM format(without zero): ");
+   gets(EndMonth);
+   printf("\n\nEnter ending day in DD format(without zero): ");
+   gets(EndDay);
+   while(IncomeTemp->next!=NULL)
+   {
+       if(atoi(IncomeTemp->Year)>=atoi(BeginYear)  &&   atoi(IncomeTemp->Year)<=atoi(EndYear))
+           if(atoi(IncomeTemp->Month)>=atoi(BeginMonth)  &&  atoi(IncomeTemp->Month)<=atoi(EndMonth))
+               if(atoi(IncomeTemp->Day)>=atoi(BeginDay)  &&  atoi(IncomeTemp->Day)<=atoi(EndDay))
+                   IncomeCount+=atoi(IncomeTemp->amount);
+       IncomeTemp=IncomeTemp->next;
+   }
+   printf("Your total income between %s/%s/%s and %s/%s/%s\nis %lld\n\n\nPress any button to continue",BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay,IncomeCount);
+   getch();
+   system("cls");
+   printf("\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
+   do
+   {
+        MenuChoose=getch();
+        temp=MenuChoose-'0';
+   }while(temp<1 || temp>3);
+   if(MenuChoose=='1')
+       MainMenu();
+   else if(MenuChoose=='2')
+       Reports();
+        else
+            Exit();
+}
+
+
+void YearlyIncome()
+{
+    system("cls");
+    struct UserIncome *head,*IncomeTemp;
+    char Year[6],MenuChoose;
+    long long int IncomeCount=0;
+    int temp;
+    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    head=IncomeIteration();
+    IncomeTemp=head;
+    printf("Please enter a year: ");
+    gets(Year);
+    while(IncomeTemp->next!=NULL)
+    {
+        if(atoi(IncomeTemp->Year)==atoi(Year))
+            IncomeCount+=atoi(IncomeTemp->amount);
+        IncomeTemp=IncomeTemp->next;
+    }
+    printf("Your income in %s is %lld\n\nPress any button to continue",Year,IncomeCount);
+    getch();
+    system("cls");
+    printf("\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
+    do
+    {
+        MenuChoose=getch();
+        temp=MenuChoose-'0';
+    }while(temp<1 || temp>3);
+    if(MenuChoose=='1')
+        MainMenu();
+    else if(MenuChoose=='2')
+        Reports();
+         else
+             Exit();
+}
+
 
 void AccountBalance()
 {
@@ -557,7 +670,7 @@ void AccountBalance()
     printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
     getch();
     system("cls");
-    printf("1) Reports menu\n2) Main menu");
+    printf("1) Return to reports menu\n2) Return to main menu");
     do
     {
         MenuChoose=getch();
@@ -624,7 +737,9 @@ int IncomeIteration()
     }while(head==NULL);
     fgets(head->amount,sizeof head->amount,Incomes);
     fgets(head->source,sizeof head->source,Incomes);
-    fgets(head->date,sizeof head->date,Incomes);
+    fgets(head->Year,sizeof head->Year,Incomes);
+    fgets(head->Month,sizeof head->Month,Incomes);
+    fgets(head->Day,sizeof head->Day,Incomes);
     fgets(head->description,sizeof head->description,Incomes);
     head->next=NULL;
     temp=head;
@@ -636,7 +751,9 @@ int IncomeIteration()
         }while(income==NULL);
         fgets(income->amount,sizeof income->amount,Incomes);
         fgets(income->source,sizeof income->source,Incomes);
-        fgets(income->date,sizeof income->date,Incomes);
+        fgets(income->Year,sizeof income->Year,Incomes);
+        fgets(income->Month,sizeof income->Month,Incomes);
+        fgets(income->Day,sizeof income->Day,Incomes);
         fgets(income->description,sizeof income->description,Incomes);
         income->next=NULL;
         temp->next=income;
@@ -662,7 +779,9 @@ int ExpenseIteration()
     }while(head==NULL);
     fgets(head->amount,sizeof head->amount,Expenses);
     fgets(head->source,sizeof head->source,Expenses);
-    fgets(head->date,sizeof head->date,Expenses);
+    fgets(head->Year,sizeof head->Year,Expenses);
+    fgets(head->Month,sizeof head->Month,Expenses);
+    fgets(head->Day,sizeof head->Day,Expenses);
     fgets(head->description,sizeof head->description,Expenses);
     head->next=NULL;
     temp=head;
@@ -674,7 +793,9 @@ int ExpenseIteration()
         }while(expense==NULL);
         fgets(expense->amount,sizeof expense->amount,Expenses);
         fgets(expense->source,sizeof expense->source,Expenses);
-        fgets(expense->date,sizeof expense->date,Expenses);
+        fgets(expense->Year,sizeof expense->Year,Expenses);
+        fgets(expense->Month,sizeof expense->Month,Expenses);
+        fgets(expense->Day,sizeof expense->Day,Expenses);
         fgets(expense->description,sizeof expense->description,Expenses);
         expense->next=NULL;
         temp->next=expense;

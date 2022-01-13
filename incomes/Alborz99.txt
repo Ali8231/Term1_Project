@@ -1,0 +1,42 @@
+12000000
+Salary
+1394
+5
+14
+
+500000000
+Loan
+1399
+12
+15
+Repay is in 5 years
+3125000
+University Grant
+1400
+1
+15
+
+14000000
+Salary
+1400
+1
+29
+
+120000
+Government Aid
+1400
+1
+19
+
+5000000
+Bank Interest
+1400
+1
+22
+
+1250000
+Pocket Money
+1400
+1
+25
+
