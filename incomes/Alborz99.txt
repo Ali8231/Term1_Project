@@ -64,3 +64,21 @@ Stocks
 1
 29
 From an startup
+5000000
+Loan
+1396
+1
+15
+
+1000000
+Government Aid
+1397
+5
+17
+For buying home
+50000000
+Salary
+1400
+1
+1
+None

@@ -4,6 +4,7 @@
 #include<windows.h>
 #include<conio.h>
 #include<time.h>
+#include <shlwapi.h>
 
 struct UserProfile
 {
@@ -54,6 +55,9 @@ int ProfileIteration();
 void EnterPass(char *password);
 void SubmitExpense();
 void Reports();
+void InputTimePeriod(int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[]);
+int CheckTimePeriod(int Year[],int Month[],int Day[],int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[]);
+
 
 void main()
 {
@@ -326,53 +330,7 @@ void SubmitIncome()
     printf("----- INCOME SUBMIT -----\n\n\nEnter amount of income in Iranian RIAL currency: ");
     gets(IncomeAmount);
     strcat(IncomeAmount,"\n");
-    printf("\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7) Other\n");
-    do
-    {
-        ChooseSource=getch();
-        temp=ChooseSource - '0';
-    }while(temp<1 || temp>7);
-
-    switch(ChooseSource)
-    {
-        case '1':
-        {
-            strcpy(SourceOfIncome,"Salary\n");
-            break;
-        }
-        case '2':
-        {
-            strcpy(SourceOfIncome,"Pocket Money\n");
-            break;
-        }
-        case '3':
-        {
-            strcpy(SourceOfIncome,"Government Aid\n");
-            break;
-        }
-        case '4':
-        {
-            strcpy(SourceOfIncome,"University Grant\n");
-            break;
-        }
-        case '5':
-        {
-            strcpy(SourceOfIncome,"Bank Interest\n");
-            break;
-        }
-        case '6':
-        {
-            strcpy(SourceOfIncome,"Loan\n");
-            break;
-        }
-        default:
-        {
-            printf("Please enter source of Income: ");
-            gets(SourceOfIncome);
-            strcat(SourceOfIncome,"\n");
-        }
-
-    }
+    ChooseSourceOfIncome(SourceOfIncome);
     printf("Please enter year of income in YYYY format: ");
     gets(YearOfIncome);
     strcat(YearOfIncome,"\n");
@@ -384,6 +342,8 @@ void SubmitIncome()
     strcat(DayOfIncome,"\n");
     printf("Please enter a short(one line) description: ");
     gets(IncomeDescription);
+    if(strcmp(IncomeDescription,"")==0)
+        strcpy(IncomeDescription,"None");
     strcat(IncomeDescription,"\n");
     fputs(IncomeAmount,Incomes);
     fputs(SourceOfIncome,Incomes);
@@ -489,6 +449,8 @@ void SubmitExpense()
     strcat(DayOfExpenditure,"\n");
     printf("Please enter a short(one line) description: ");
     gets(ExpenseDescription);
+    if(strcmp(ExpenseDescription,"")==0)
+        strcpy(ExpenseDescription,"None");
     strcat(ExpenseDescription,"\n");
     fputs(ExpenseAmount,Expenses);
     fputs(SubjectOfExpense,Expenses);
@@ -536,7 +498,7 @@ void IncomeReports()
     system("cls");
     char IncomeReportType;
     int temp;
-    printf("-----  INCOME REPORTS  -----\n\n\nPlease choose report type from the list: \n\n\n1) Yearly incomes\n2) Incomes in a timespan\n3) Specific income in a timespan\n4) Incomes share ratio\n5) Minor incomes\n6) Highest income in a timespan\n7) Search in descriptions");
+    printf("-----  INCOME REPORTS  -----\n\n\nPlease choose report type from the list: \n\n\n1) Annual income statement\n2) Income statement for a time period\n3) Specific income statement for a time period\n4) Incomes share ratio\n5) Detailed income statement for a time period\n6) Highest income in a time period\n7) Search in descriptions");
     do
     {
         IncomeReportType=getch();
@@ -546,17 +508,17 @@ void IncomeReports()
     {
         case '1':
         {
-            YearlyIncome();
+            AnnualIncome();
             break;
         }
         case '2':
         {
-            IncomeInTimespan();
+            IncomeInTimePeriod();
             break;
         }
         case '3':
         {
-            SpecificIncomeInTimespan();
+            SpecificIncomeInTimePeriod();
             break;
         }
         case '4':
@@ -571,95 +533,181 @@ void IncomeReports()
             if(IncomeReportType=='1')
                 IncomesShareRatio();
             else
-                IncomesShareRatioInTimespan();
+                IncomesShareRatioInTimePeriod();
             break;
         }
-
+        case '5':
+        {
+            DetailedIncomesInTimePeriod();
+            break;
+        }
+        case '6':
+        {
+            HighestIncomeInTimePeriod();
+            break;
+        }
+        default:
+        {
+            IncomeSearchInDescription();
+        }
     }
 }
 
-void IncomesShareRatioInTimespan()
+void IncomeSearchInDescription()
+{
+    system("cls");
+    struct UserIncome *head,*IncomeTemp;
+    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    head=IncomeIteration();
+    IncomeTemp=head;
+    char WordInDescription[100];
+    int count=1;
+    printf("Please enter a word or phrase: ");
+    gets(WordInDescription);
+    system("cls");
+    while(IncomeTemp->next!=NULL)
+    {
+        if(StrStrIA(IncomeTemp->description,WordInDescription)!=NULL)
+        {
+            printf("INCOME #%d\n\n",count);
+            IncomeTemp->amount[strlen(IncomeTemp->amount)-1]='\0';
+            printf("Amount = ",IncomeTemp->amount);
+            puts(IncomeTemp->amount);
+            IncomeTemp->source[strlen(IncomeTemp->source)-1]='\0';
+            printf("Source : ");
+            puts(IncomeTemp->source);
+            IncomeTemp->Year[strlen(IncomeTemp->Year)-1]='\0';
+            IncomeTemp->Month[strlen(IncomeTemp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day);
+            IncomeTemp->description[strlen(IncomeTemp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(IncomeTemp->description,"")==0)
+                printf("None");
+            else
+                puts(IncomeTemp->description);
+            count++;
+            printf("\n\n\n\n\n");
+        }
+        IncomeTemp=IncomeTemp->next;
+    }
+}
+
+void HighestIncomeInTimePeriod()
+{
+    system("cls");
+    char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4];
+    char *end;
+    int IncomeDate;
+    long long int HighestIncome=0;
+    struct UserIncome *head,*IncomeTemp;
+    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    head=IncomeIteration();
+    IncomeTemp=head;
+    InputTimePeriod(BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+    while(IncomeTemp->next!=NULL)
+    {
+        IncomeDate=CheckTimePeriod(IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+        if(IncomeDate==0)//if income is in time period
+        {
+            if(HighestIncome==0)
+            {
+                HighestIncome=strtoull(IncomeTemp->amount,&end,10);
+                IncomeTemp=IncomeTemp->next;
+                continue;
+            }
+            if(strtoull(IncomeTemp,&end,10)>HighestIncome)
+                HighestIncome=strtoull(IncomeTemp,&end,10);
+        }
+        IncomeTemp=IncomeTemp->next;
+    }
+    system("cls");
+    if(HighestIncome==0)
+        printf("\n\n\nYou have not submitted any income in this time period");
+    else
+        printf("\n\n\nYour highest income between %s/%s/%s and %s/%s/%s\nis %lld",BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay,HighestIncome);
+    printf("\n\n\nPress any button to continue");
+    getch();
+    ReturnToMenu();
+}
+
+void DetailedIncomesInTimePeriod()
+{
+    system("cls");
+    char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4];
+    char *end;
+    int IncomeDate,count=1;
+    struct UserIncome *head,*IncomeTemp;
+    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    head=IncomeIteration();
+    IncomeTemp=head;
+    InputTimePeriod(BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+    system("cls");
+    while(IncomeTemp->next!=NULL)
+    {
+        IncomeDate=CheckTimePeriod(IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+        if(IncomeDate==0)
+        {
+            printf("INCOME #%d\n\n",count);
+            IncomeTemp->amount[strlen(IncomeTemp->amount)-1]='\0';
+            printf("Amount = ",IncomeTemp->amount);
+            puts(IncomeTemp->amount);
+            IncomeTemp->source[strlen(IncomeTemp->source)-1]='\0';
+            printf("Source : ");
+            puts(IncomeTemp->source);
+            IncomeTemp->Year[strlen(IncomeTemp->Year)-1]='\0';
+            IncomeTemp->Month[strlen(IncomeTemp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day);
+            IncomeTemp->description[strlen(IncomeTemp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(IncomeTemp->description,"")==0)
+                printf("None");
+            else
+                puts(IncomeTemp->description);
+            count++;
+            printf("\n\n\n\n\n");
+        }
+        IncomeTemp=IncomeTemp->next;
+    }
+    printf("\n\n\nPress enter to continue");
+    getch();
+    ReturnToMenu();
+}
+
+
+void IncomesShareRatioInTimePeriod()
 {
    system("cls");
-   char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4],MenuChoose;
+   char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4];
    char *end;
    long long int SalaryCount=0,PocketCount=0,GrantCount=0,GovAidCount=0,LoanCount=0,InterestCount=0,SUM=0,OthersCount=0;;
-   int temp;
+   int IncomeDate;
    double SalaryShare=0,PocketShare=0,GrantShare=0,GovAidShare=0,LoanShare=0,InterestShare=0,OthersShare=0;
    struct UserIncome *head,*IncomeTemp;
    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
    head=IncomeIteration();
    IncomeTemp=head;
-   printf("Enter beginning year in YYYY format: ");
-   gets(BeginYear);
-   printf("Enter beginning month in MM format (without zero): ");
-   gets(BeginMonth);
-   printf("Enter beginning day in DD format (without zero): ");
-   gets(BeginDay);
-   printf("\n\n\nEnter ending year in YYYY format: ");
-   gets(EndYear);
-   printf("Enter ending month in MM format (without zero): ");
-   gets(EndMonth);
-   printf("Enter ending day in DD format (without zero): ");
-   gets(EndDay);
+   InputTimePeriod(BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
    while(IncomeTemp->next!=NULL)
    {
-        if(strtoul(IncomeTemp->Year,&end,10)>=strtoul(BeginYear,&end,10)  &&   strtoul(IncomeTemp->Year,&end,10)<=strtoul(EndYear,&end,10))
+        IncomeDate=CheckTimePeriod(IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+        if(IncomeDate==0)
         {
-               if(strtoul(IncomeTemp->Year,&end,10)==strtoul(BeginYear,&end,10))
-               {
-                   if(strtoul(IncomeTemp->Month,&end,10)<strtoul(BeginMonth,&end,10))
-                   {
-                       IncomeTemp=IncomeTemp->next;
-                       continue;
-                   }
-                   if(strtoul(IncomeTemp->Month,&end,10)==strtoul(BeginMonth,&end,10))
-                       if(strtoul(IncomeTemp->Day,&end,10)<strtoul(BeginDay,&end,10))
-                       {
-                           IncomeTemp=IncomeTemp->next;
-                           continue;
-                       }
-
-
-               }
-               if(strtoul(IncomeTemp->Year,&end,10)==strtoul(EndYear,&end,10))
-               {
-                   if(strtoul(IncomeTemp->Month,&end,10)>strtoul(EndMonth,&end,10))
-                   {
-                       IncomeTemp=IncomeTemp->next;
-                       continue;
-                   }
-                   if(strtoul(IncomeTemp->Month,&end,10)==strtoul(EndMonth,&end,10))
-                       if(strtoul(IncomeTemp->Day,&end,10)>strtoul(EndDay,&end,10))
-                       {
-                           IncomeTemp=IncomeTemp->next;
-                           continue;
-                       }
-
-               }
+            if(strcasecmp(IncomeTemp->source,"Salary\n")==0)
+                SalaryCount+=strtoull(IncomeTemp->amount,&end,10);
+            else if(strcasecmp(IncomeTemp->source,"Pocket Money\n")==0)
+                PocketCount+=strtoull(IncomeTemp->amount,&end,10);
+            else if(strcasecmp(IncomeTemp->source,"University Grant\n")==0)
+                GrantCount+=strtoull(IncomeTemp->amount,&end,10);
+            else if(strcasecmp(IncomeTemp->source,"Government Aid\n")==0)
+                GovAidCount+=strtoull(IncomeTemp->amount,&end,10);
+            else if(strcasecmp(IncomeTemp->source,"Loan\n")==0)
+                LoanCount+=strtoull(IncomeTemp->amount,&end,10);
+            else if(strcasecmp(IncomeTemp->source,"Bank Interest\n")==0)
+                InterestCount+=strtoull(IncomeTemp->amount,&end,10);
+            else
+                OthersCount+=strtoull(IncomeTemp->amount,&end,10);
+            SUM+=strtoull(IncomeTemp->amount,&end,10);
         }
-        else
-        {
-            IncomeTemp=IncomeTemp->next;
-            continue;
-        }
-
-
-        if(strcasecmp(IncomeTemp->source,"Salary\n")==0)
-            SalaryCount+=strtoull(IncomeTemp->amount,&end,10);
-        else if(strcasecmp(IncomeTemp->source,"Pocket Money\n")==0)
-            PocketCount+=strtoull(IncomeTemp->amount,&end,10);
-        else if(strcasecmp(IncomeTemp->source,"University Grant\n")==0)
-            GrantCount+=strtoull(IncomeTemp->amount,&end,10);
-        else if(strcasecmp(IncomeTemp->source,"Government Aid\n")==0)
-            GovAidCount+=strtoull(IncomeTemp->amount,&end,10);
-        else if(strcasecmp(IncomeTemp->source,"Loan\n")==0)
-            LoanCount+=strtoull(IncomeTemp->amount,&end,10);
-        else if(strcasecmp(IncomeTemp->source,"Bank Interest\n")==0)
-            InterestCount+=strtoull(IncomeTemp->amount,&end,10);
-        else
-            OthersCount+=strtoull(IncomeTemp->amount,&end,10);
-        SUM+=strtoull(IncomeTemp->amount,&end,10);
         IncomeTemp=IncomeTemp->next;
    }
    SalaryShare=((double)SalaryCount/SUM) * 100;
@@ -672,29 +720,15 @@ void IncomesShareRatioInTimespan()
    system("cls");
    printf("\n\nYour income share ratio between %s/%s/%s and %s/%s/%s :\n\n\nSalary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\nLoan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay,SalaryShare,PocketShare,GrantShare,GovAidShare,LoanShare,InterestShare,OthersShare);
    getch();
-   system("cls");
-   printf("\n\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
-   do
-   {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-   }while(temp<1 || temp>3);
-   if(MenuChoose=='1')
-       MainMenu();
-   else if(MenuChoose=='2')
-       Reports();
-        else
-            Exit();
+   ReturnToMenu();
 }
 
 
 void IncomesShareRatio()
 {
    system("cls");
-   char MenuChoose;
    char *end;
    long long int SalaryCount=0,PocketCount=0,GrantCount=0,GovAidCount=0,LoanCount=0,InterestCount=0,SUM=0,OthersCount=0;;
-   int temp;
    double SalaryShare=0,PocketShare=0,GrantShare=0,GovAidShare=0,LoanShare=0,InterestShare=0,OthersShare=0;
    struct UserIncome *head,*IncomeTemp;
    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
@@ -729,178 +763,74 @@ void IncomesShareRatio()
    system("cls");
    printf("\n\nYour All time income share ratio :\n\n\nSalary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\nLoan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",SalaryShare,PocketShare,GrantShare,GovAidShare,LoanShare,InterestShare,OthersShare);
    getch();
-   system("cls");
-   printf("\n\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
-   do
-   {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-   }while(temp<1 || temp>3);
-   if(MenuChoose=='1')
-       MainMenu();
-   else if(MenuChoose=='2')
-       Reports();
-        else
-            Exit();
+   ReturnToMenu();
 }
 
 
-void SpecificIncomeInTimespan()
+void SpecificIncomeInTimePeriod()
 {
    system("cls");
    struct UserIncome *head,*IncomeTemp;
-   char SourceOfIncome[30],BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4],MenuChoose,ChooseSource;
+   char SourceOfIncome[30],BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4],ChooseSource;
    char *end;
    long long int IncomeCount=0;
-   int temp;
+   int temp,IncomeDate;
    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
    head=IncomeIteration();
    IncomeTemp=head;
-   printf("\n\nPlease choose source of income :\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7) Other\n");
-   do
-   {
-       ChooseSource=getch();
-       temp=ChooseSource - '0';
-   }while(temp<1 || temp>7);
-
-   switch(ChooseSource)
-   {
-        case '1':
-        {
-            strcpy(SourceOfIncome,"Salary\n");
-            break;
-        }
-        case '2':
-        {
-            strcpy(SourceOfIncome,"Pocket Money\n");
-            break;
-        }
-        case '3':
-        {
-            strcpy(SourceOfIncome,"Government Aid\n");
-            break;
-        }
-        case '4':
-        {
-            strcpy(SourceOfIncome,"University Grant\n");
-            break;
-        }
-        case '5':
-        {
-            strcpy(SourceOfIncome,"Bank Interest\n");
-            break;
-        }
-        case '6':
-        {
-            strcpy(SourceOfIncome,"Loan\n");
-            break;
-        }
-        default:
-        {
-            printf("\n\nPlease enter source of Income: ");
-            gets(SourceOfIncome);
-            strcat(SourceOfIncome,"\n");
-        }
-    }
-   printf("Enter beginning year in YYYY format: ");
-   gets(BeginYear);
-   printf("Enter beginning month in MM format (without zero): ");
-   gets(BeginMonth);
-   printf("Enter beginning day in DD format (without zero): ");
-   gets(BeginDay);
-   printf("\n\n\nEnter ending year in YYYY format: ");
-   gets(EndYear);
-   printf("Enter ending month in MM format (without zero): ");
-   gets(EndMonth);
-   printf("Enter ending day in DD format (without zero): ");
-   gets(EndDay);
+   ChooseSourceOfIncome(SourceOfIncome);
+   InputTimePeriod(BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
    while(IncomeTemp->next!=NULL)
    {
        if(strcasecmp(IncomeTemp->source,SourceOfIncome)==0)
-           if(atoi(IncomeTemp->Year)>=atoi(BeginYear)  &&   atoi(IncomeTemp->Year)<=atoi(EndYear))
-               if(atoi(IncomeTemp->Month)>=atoi(BeginMonth)  &&  atoi(IncomeTemp->Month)<=atoi(EndMonth))
-                   if(atoi(IncomeTemp->Day)>=atoi(BeginDay)  &&  atoi(IncomeTemp->Day)<=atoi(EndDay))
-                       IncomeCount+=strtoull(IncomeTemp->amount,&end,10);
+       {
+           IncomeDate=CheckTimePeriod(IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+           if(IncomeDate==0)
+               IncomeCount+=strtoull(IncomeTemp->amount,&end,10);
+       }
        IncomeTemp=IncomeTemp->next;
    }
    SourceOfIncome[strlen(SourceOfIncome)-1]='\0';
    system("cls");
    printf("\n\n\nYour total income from %s between %s/%s/%s and %s/%s/%s\nis %lld Iranian RIALS.\n\n\nPress any button to continue",SourceOfIncome,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay,IncomeCount);
    getch();
-   system("cls");
-   printf("\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
-   do
-   {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-   }while(temp<1 || temp>3);
-   if(MenuChoose=='1')
-       MainMenu();
-   else if(MenuChoose=='2')
-       Reports();
-        else
-            Exit();
+   ReturnToMenu();
 }
 
 
-void IncomeInTimespan()
+void IncomeInTimePeriod()
 {
    system("cls");
    struct UserIncome *head,*IncomeTemp;
-   char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4],MenuChoose;
+   char BeginYear[6],EndYear[6],BeginMonth[4],EndMonth[4],BeginDay[4],EndDay[4];
    char *end;
    long long int IncomeCount=0;
-   int temp;
+   int IncomeDate;
    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
    head=IncomeIteration();
    IncomeTemp=head;
-   printf("Enter beginning year in YYYY format: ");
-   gets(BeginYear);
-   printf("Enter beginning month in MM format (without zero): ");
-   gets(BeginMonth);
-   printf("Enter beginning day in DD format (without zero): ");
-   gets(BeginDay);
-   printf("\n\n\nEnter ending year in YYYY format: ");
-   gets(EndYear);
-   printf("Enter ending month in MM format (without zero): ");
-   gets(EndMonth);
-   printf("Enter ending day in DD format (without zero): ");
-   gets(EndDay);
+   InputTimePeriod(BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
    while(IncomeTemp->next!=NULL)
    {
-       if(atoi(IncomeTemp->Year)>=atoi(BeginYear)  &&   atoi(IncomeTemp->Year)<=atoi(EndYear))
-           if(atoi(IncomeTemp->Month)>=atoi(BeginMonth)  &&  atoi(IncomeTemp->Month)<=atoi(EndMonth))
-               if(atoi(IncomeTemp->Day)>=atoi(BeginDay)  &&  atoi(IncomeTemp->Day)<=atoi(EndDay))
-                   IncomeCount+=strtoull(IncomeTemp->amount,&end,10);
+       IncomeDate=CheckTimePeriod(IncomeTemp->Year,IncomeTemp->Month,IncomeTemp->Day,BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay);
+       if(IncomeDate==0)
+           IncomeCount+=strtoull(IncomeTemp->amount,&end,10);
        IncomeTemp=IncomeTemp->next;
    }
    system("cls");
    printf("\n\n\nYour total income between %s/%s/%s and %s/%s/%s\nis %lld Iranian RIALS.\n\n\nPress any button to continue",BeginYear,BeginMonth,BeginDay,EndYear,EndMonth,EndDay,IncomeCount);
    getch();
-   system("cls");
-   printf("\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
-   do
-   {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-   }while(temp<1 || temp>3);
-   if(MenuChoose=='1')
-       MainMenu();
-   else if(MenuChoose=='2')
-       Reports();
-        else
-            Exit();
+   ReturnToMenu();
 }
 
 
-void YearlyIncome()
+void AnnualIncome()
 {
     system("cls");
     struct UserIncome *head,*IncomeTemp;
-    char Year[6],MenuChoose;
+    char Year[6];
     char *end;
     long long int IncomeCount=0;
-    int temp;
     head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
     head=IncomeIteration();
     IncomeTemp=head;
@@ -914,19 +844,7 @@ void YearlyIncome()
     }
     printf("Your income in %s is %lld\n\nPress any button to continue",Year,IncomeCount);
     getch();
-    system("cls");
-    printf("\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
-    do
-    {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-    }while(temp<1 || temp>3);
-    if(MenuChoose=='1')
-        MainMenu();
-    else if(MenuChoose=='2')
-        Reports();
-         else
-             Exit();
+    ReturnToMenu();
 }
 
 
@@ -934,8 +852,6 @@ void AccountBalance()
 {
     system("cls");
     long long int IncomeCount=0,ExpenseCount=0,Balance=0;
-    int temp;
-    char MenuChoose;
     char *end;
     struct UserIncome *IncomeHead,*IncomeTemp;
     struct UserExpense *ExpenseHead, *ExpenseTemp;
@@ -958,17 +874,7 @@ void AccountBalance()
     Balance=IncomeCount-ExpenseCount;
     printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
     getch();
-    system("cls");
-    printf("1) Return to reports menu\n2) Return to main menu");
-    do
-    {
-        MenuChoose=getch();
-        temp=MenuChoose-'0';
-    }while(temp!=1 && temp!=2);
-    if(MenuChoose=='1')
-        Reports();
-    else
-        MainMenu();
+    ReturnToMenu();
 }
 
 
@@ -1093,4 +999,120 @@ int ExpenseIteration()
     fclose(Expenses);
     return head;
 }
+
+
+int CheckTimePeriod(int Year[],int Month[],int Day[],int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[])
+{
+    char *end;
+    if(strtoul(Year,&end,10)>=strtoul(BeginYear,&end,10)  &&   strtoul(Year,&end,10)<=strtoul(EndYear,&end,10))
+       {
+            if(strtoul(Year,&end,10)==strtoul(BeginYear,&end,10))
+            {
+                if(strtoul(Month,&end,10)<strtoul(BeginMonth,&end,10))
+                    return -1;
+                if(strtoul(Month,&end,10)==strtoul(BeginMonth,&end,10))
+                    if(strtoul(Day,&end,10)<strtoul(BeginDay,&end,10))
+                        return -1;
+            }
+            if(strtoul(Year,&end,10)==strtoul(EndYear,&end,10))
+            {
+                if(strtoul(Month,&end,10)>strtoul(EndMonth,&end,10))
+                    return -1;
+                if(strtoul(Month,&end,10)==strtoul(EndMonth,&end,10))
+                    if(strtoul(Day,&end,10)>strtoul(EndDay,&end,10))
+                        return -1;
+            }
+        }
+    else
+        return -1;
+    return 0;
+}
+
+void InputTimePeriod(int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[])
+{
+   printf("Enter beginning year in YYYY format: ");
+   gets(BeginYear);
+   printf("Enter beginning month in MM format (without zero): ");
+   gets(BeginMonth);
+   printf("Enter beginning day in DD format (without zero): ");
+   gets(BeginDay);
+   printf("\n\n\nEnter ending year in YYYY format: ");
+   gets(EndYear);
+   printf("Enter ending month in MM format (without zero): ");
+   gets(EndMonth);
+   printf("Enter ending day in DD format (without zero): ");
+   gets(EndDay);
+}
+
+void ReturnToMenu()
+{
+    int temp;
+    char MenuChoose;
+    system("cls");
+    printf("\n\n1) Return to main menu\n2) Return to reports menu\n3) Exit");
+    do
+    {
+        MenuChoose=getch();
+        temp=MenuChoose-'0';
+    }while(temp<1 || temp>3);
+    if(MenuChoose=='1')
+        MainMenu();
+    else if(MenuChoose=='2')
+        Reports();
+         else
+             Exit();
+}
+
+void ChooseSourceOfIncome(int SourceOfIncome[])
+{
+    char ChooseSource;
+    int temp;
+    printf("\n\nPlease choose source of income :\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7) Other\n");
+    do
+    {
+        ChooseSource=getch();
+        temp=ChooseSource - '0';
+    }while(temp<1 || temp>7);
+
+    switch(ChooseSource)
+    {
+        case '1':
+        {
+            strcpy(SourceOfIncome,"Salary\n");
+            break;
+        }
+        case '2':
+        {
+            strcpy(SourceOfIncome,"Pocket Money\n");
+            break;
+        }
+        case '3':
+        {
+            strcpy(SourceOfIncome,"Government Aid\n");
+            break;
+        }
+        case '4':
+        {
+            strcpy(SourceOfIncome,"University Grant\n");
+            break;
+        }
+        case '5':
+        {
+            strcpy(SourceOfIncome,"Bank Interest\n");
+            break;
+        }
+        case '6':
+        {
+            strcpy(SourceOfIncome,"Loan\n");
+            break;
+        }
+        default:
+        {
+            printf("\n\nPlease enter source of Income: ");
+            gets(SourceOfIncome);
+            strcat(SourceOfIncome,"\n");
+        }
+   }
+}
+
 
