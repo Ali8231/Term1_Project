@@ -33,7 +33,7 @@ struct UserIncome
 struct UserExpense
 {
    char amount[25];
-   char source[35];
+   char subject[35];
    char Year[7];
    char Month[5];
    char Day[5];
@@ -44,19 +44,19 @@ struct UserExpense
 
 char g_username[20];
 
-void SubmitIncome();
-void EntranceMenu();
+void Submit_Income();
+void Entrance_Menu();
 void Signup();
 void Login();
-int UserNameSearch();
-int LoginPassCheck(int password[]);
-void MainMenu();
-int ProfileIteration();
-void EnterPass(char *password);
-void SubmitExpense();
+int User_Name_Search();
+int Login_Pass_Check(int password[]);
+void Main_Menu();
+int Profile_Iteration();
+void Enter_Pass(char *password);
+void Submit_Expense();
 void Reports();
-void InputTimePeriod(int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[]);
-int CheckTimePeriod(int Year[],int Month[],int Day[],int BeginYear[],int BeginMonth[],int BeginDay[],int EndYear[],int EndMonth[],int EndDay[]);
+void Input_Time_Period(int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[]);
+int Check_Time_Period(int Year[],int Month[],int Day[],int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[]);
 
 
 void main()
@@ -273,7 +273,7 @@ int Login_Pass_Check(int password[])
     temp=head;
     strcpy(temp_Username,g_username);
     strcpy(temp_Password,password);
-    strcat(temp_Username,"\n");//in file last character of each element there is a \n to go to next line.concatenation is to match two strings for strcmp
+    strcat(temp_Username,"\n");//in file last character of each element is a \n to go to next line.concatenation of \n is to match two strings for strcmp
     strcat(temp_Password,"\n");
     while(temp->next!=NULL)//This is because all of my linked lists last nodes are always empty for unknown reasons.so I do not read the last nodes
     {
@@ -385,62 +385,7 @@ void Submit_Expense()
     printf("----- EXPENSE SUBMIT -----\n\n\nEnter amount of expenditure in Iranian RIAL currency: ");
     gets(Expense_Amount);
     strcat(Expense_Amount,"\n");
-    printf("\n\n1) Healthcare\n2) Food\n3) Bills\n4) Education\n5) Transportation\n6) Clothing\n7) Charity\n8) Recreation\n9) Other\n");
-    do
-    {
-        Choose_Subject=getch();
-        temp=Choose_Subject - '0';
-    }while(temp<1 || temp>9);
-
-    switch(Choose_Subject)
-    {
-        case '1':
-        {
-            strcpy(Subject_Of_Expense,"Healthcare\n");
-            break;
-        }
-        case '2':
-        {
-            strcpy(Subject_Of_Expense,"Food\n");
-            break;
-        }
-        case '3':
-        {
-            strcpy(Subject_Of_Expense,"Bills\n");
-            break;
-        }
-        case '4':
-        {
-            strcpy(Subject_Of_Expense,"Education\n");
-            break;
-        }
-        case '5':
-        {
-            strcpy(Subject_Of_Expense,"Transportation\n");
-            break;
-        }
-        case '6':
-        {
-            strcpy(Subject_Of_Expense,"Clothing\n");
-            break;
-        }
-        case '7':
-        {
-            strcpy(Subject_Of_Expense,"Charity\n");
-            break;
-        }
-        case '8':
-        {
-            strcpy(Subject_Of_Expense,"Recreation\n");
-            break;
-        }
-        default:
-        {
-            printf("Please enter subject of expenditure: ");
-            gets(Subject_Of_Expense);
-            strcat(Subject_Of_Expense,"\n");
-        }
-    }
+    Choose_Subject_Of_Expense(Subject_Of_Expense);
     printf("Please enter year of expenditure in YYYY format: ");
     gets(Year_Of_Expenditure);
     strcat(Year_Of_Expenditure,"\n");
@@ -494,6 +439,8 @@ void Reports()
         Account_Balance();
     else if(Report_Type_Choice=='2')
         Income_Reports();
+    else
+        Expense_Reports();
 }
 
 void Income_Reports()
@@ -595,6 +542,9 @@ void Income_Search_In_Description()
         }
         Income_Temp=Income_Temp->next;
     }
+    printf("\n\n\nPress any button to continue");
+    getch();
+    Return_To_Menu();
 }
 
 void Highest_Income_In_Time_Period()
@@ -630,7 +580,7 @@ void Highest_Income_In_Time_Period()
         printf("\n\n\nYou have not submitted any income in this time period");
     else
         printf("\n\n\nYour highest income between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Income);
-    printf("\n\n\nPress any button to continue");
+    printf(" Iranian RIALS.\n\n\nPress any button to continue");
     getch();//waits for user to press a key
     Return_To_Menu();
 }
@@ -727,7 +677,7 @@ void Incomes_Share_Ratio_In_Time_Period()
    printf("Salary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\n",Salary_Share,Pocket_Share,Grant_Share,Gov_Aid_Share);
    printf("Loan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Loan_Share,Interest_Share,Others_Share);
    getch();
-   Return_To_Menu();//at the end user can go back to reports or main menu or exit
+   Return_To_Menu();//at the end user can go back to reports menu,main menu or exit
 }
 
 
@@ -768,9 +718,9 @@ void Incomes_Share_Ratio()
    Interest_Share=((double)Interest_Count/SUM) * 100;
    Others_Share=((double)Others_Count/SUM) * 100;
    system("cls");
-   printf("\n\nYour All time income share ratio :\n\n\nSalary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\n",Salary_Share,Pocket_Share,Grant_Share);
-   printf("Government Aid %12.3Lf%%\nLoan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%",Gov_Aid_Share,Loan_Share,Interest_Share,Others_Share);
-   printf("\n\n\nPress any button to continue");
+   printf("\n\nYour All time income share ratio :\n\n\nSalary %20.3Lf%%\nPocket Money %14.3Lf%%\n",Salary_Share,Pocket_Share);
+   printf("University Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\nLoan %22.3Lf%%\n",Grant_Share,Gov_Aid_Share,Loan_Share);
+   printf("Bank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Interest_Share,Others_Share);
    getch();
    Return_To_Menu();
 }
@@ -801,8 +751,8 @@ void Specific_Income_In_Time_Period()
    }
    Source_Of_Income[strlen(Source_Of_Income)-1]='\0';
    system("cls");
-   printf("\n\n\nYour total income from %s between %s/%s/%s and %s/%s/%s\nis %lld Iranian RIALS.",Source_Of_Income,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Income_Count);
-   printf("\n\n\nPress any button to continue");
+   printf("\n\n\nYour total income from %s between %s/%s/%s and %s/%s/%s\n",Source_Of_Income,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Income_Count);
    getch();
    Return_To_Menu();
 }
@@ -828,8 +778,8 @@ void Income_In_Time_Period()
        Income_Temp=Income_Temp->next;
    }
    system("cls");
-   printf("\n\n\nYour total income between %s/%s/%s and %s/%s/%s\nis %lld Iranian RIALS.",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Income_Count);
-   printf("\n\n\nPress any button to continue");
+   printf("\n\n\nYour total income between %s/%s/%s and %s/%s/%s\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Income_Count);
    getch();
    Return_To_Menu();
 }
@@ -849,11 +799,11 @@ void Annual_Income()
     gets(Year);
     while(Income_Temp->next!=NULL)
     {
-        if(atoi(Income_Temp->Year)==atoi(Year))
+        if(strtol(Income_Temp->Year,&end,10)==strtol(Year,&end,10))
             Income_Count+=strtoull(Income_Temp->amount,&end,10);
         Income_Temp=Income_Temp->next;
     }
-    printf("Your income in %s is %lld\n\nPress any button to continue",Year,Income_Count);
+    printf("Your income in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Income_Count);
     getch();
     Return_To_Menu();
 }
@@ -884,6 +834,407 @@ void Account_Balance()
     }
     Balance=Income_Count-Expense_Count;
     printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
+    getch();
+    Return_To_Menu();
+}
+
+void Expense_Reports()
+{
+    system("cls");
+    char Expense_Report_Type;
+    int temp;
+    printf("-----  EXPENSE REPORTS  -----\n\n\nPlease choose report type from the list: \n\n\n1) Annual expense statement\n");
+    printf("2) Expense statement for a time period\n3) Specific expense statement for a time period\n4) Expense share ratio\n");
+    printf("5) Detailed expense statement for a time period\n6) Highest expense in a time period\n7) Search in descriptions");
+    do
+    {
+        Expense_Report_Type=getch();
+        temp=Expense_Report_Type-'0';
+    }while(temp<1 || temp>7);
+    switch(Expense_Report_Type)
+    {
+        case '1':
+        {
+            Annual_Expense();
+            break;
+        }
+        case '2':
+        {
+            Expense_In_Time_Period();
+            break;
+        }
+        case '3':
+        {
+            Specific_Expense_In_Time_Period();
+            break;
+        }
+        case '4':
+        {
+            system("cls");
+            printf("\n\n\nPlease choose time period of the report: \n\n\n1) All time\n2) Specific period ");
+            do
+            {
+                Expense_Report_Type=getch();
+                temp=Expense_Report_Type-'0';
+            }while(temp!=1 && temp!=2);
+            if(Expense_Report_Type=='1')
+                Expense_Share_Ratio();
+            else
+                Expense_Share_Ratio_In_Time_Period();
+            break;
+        }
+        case '5':
+        {
+            Detailed_Expense_In_Time_Period();
+            break;
+        }
+        case '6':
+        {
+            Highest_Expense_In_Time_Period();
+            break;
+        }
+        default:
+        {
+            Expense_Search_In_Description();
+        }
+    }
+}
+
+void Annual_Expense()
+{
+    system("cls");
+    struct UserExpense *head,*Expense_Temp;
+    char Year[6];
+    char *end;
+    long long int Expense_Count=0;
+    head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    head=Expense_Iteration();
+    Expense_Temp=head;
+    printf("Please enter a year: ");
+    gets(Year);
+    while(Expense_Temp->next!=NULL)
+    {
+        if(strtol(Expense_Temp->Year,&end,10)==strtol(Year,&end,10))
+            Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
+        Expense_Temp=Expense_Temp->next;
+    }
+    printf("Your expense amount in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Expense_Count);
+    getch();
+    Return_To_Menu();
+}
+
+
+void Expense_In_Time_Period()
+{
+   system("cls");
+   struct UserExpense *head,*Expense_Temp;
+   char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+   char *end;
+   long long int Expense_Count=0;
+   int Expense_Date;
+   head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+   head=Expense_Iteration();
+   Expense_Temp=head;
+   Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   while(Expense_Temp->next!=NULL)
+   {
+       Expense_Date=Check_Time_Period(Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+       if(Expense_Date==0)
+           Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
+       Expense_Temp=Expense_Temp->next;
+   }
+   system("cls");
+   printf("\n\n\nYour total expense between %s/%s/%s and %s/%s/%s\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Expense_Count);
+   getch();
+   Return_To_Menu();
+}
+
+void Specific_Expense_In_Time_Period()
+{
+   system("cls");
+   struct UserExpense *head,*Expense_Temp;
+   char Subject_Of_Expense[30],Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+   char *end;
+   long long int Expense_Count=0;
+   int temp,Expense_Date;
+   head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+   head=Expense_Iteration();
+   Expense_Temp=head;
+   Choose_Subject_Of_Expense(Subject_Of_Expense);
+   Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   while(Expense_Temp->next!=NULL)
+   {
+       if(strcasecmp(Expense_Temp->subject,Subject_Of_Expense)==0)
+       {
+           Expense_Date=Check_Time_Period(Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+           if(Expense_Date==0)
+               Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
+       }
+       Expense_Temp=Expense_Temp->next;
+   }
+   Subject_Of_Expense[strlen(Subject_Of_Expense)-1]='\0';
+   system("cls");
+   printf("\n\n\nYour total expense from %s between %s/%s/%s and %s/%s/%s\n",Subject_Of_Expense,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Expense_Count);
+   getch();
+   Return_To_Menu();
+}
+
+void Expense_Share_Ratio()
+{
+   system("cls");
+   char *end;
+   long long int Healthcare_Count=0,Food_Count=0,Care_Cleaning_Count=0,Bills_Count=0,Rent_Mortgage_Count=0,Loan_Payment_Count=0,Education_Count=0;
+   long long int Transportation_Count=0,Clothing_Count=0,Recreation_Count=0,Charity_Count=0,Others_Count=0,SUM=0;
+   double Healthcare_Share=0,Food_Share=0,Care_Cleaning_Share=0,Bills_Share=0,Rent_Mortgage_Share=0,Loan_Payment_Share=0,Education_Share=0;
+   double Transportation_Share=0,Clothing_Share=0,Recreation_Share=0,Charity_Share=0,Others_Share=0;
+   struct UserExpense *head,*Expense_Temp;
+   head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+   head=Expense_Iteration();
+   Expense_Temp=head;
+   while(Expense_Temp->next!=NULL)
+   {
+       if(strcasecmp(Expense_Temp->subject,"Healthcare\n")==0)
+           Healthcare_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Food\n")==0)
+            Food_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Personal Care & Cleaning\n")==0)
+           Care_Cleaning_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Bills\n")==0)
+           Bills_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Rent & Mortgage\n")==0)
+           Rent_Mortgage_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Loan Payment\n")==0)
+           Loan_Payment_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Education\n")==0)
+           Education_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Transportation\n")==0)
+           Transportation_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Clothing\n")==0)
+           Clothing_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Recreation\n")==0)
+           Recreation_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else if(strcasecmp(Expense_Temp->subject,"Charity\n")==0)
+           Charity_Count+=strtoull(Expense_Temp->amount,&end,10);
+       else
+           Others_Count+=strtoull(Expense_Temp->amount,&end,10);
+       SUM+=strtoull(Expense_Temp->amount,&end,10);
+       Expense_Temp=Expense_Temp->next;
+   }
+   Healthcare_Share=((double)Healthcare_Count/SUM) * 100;
+   Food_Share=((double)Food_Count/SUM) * 100;
+   Care_Cleaning_Share=((double)Care_Cleaning_Count/SUM) * 100;
+   Bills_Share=((double)Bills_Count/SUM) * 100;
+   Rent_Mortgage_Share=((double)Rent_Mortgage_Count/SUM) * 100;
+   Loan_Payment_Share=((double)Loan_Payment_Count/SUM) * 100;
+   Education_Share=((double)Education_Count/SUM) * 100;
+   Transportation_Share=((double)Transportation_Count/SUM) * 100;
+   Clothing_Share=((double)Clothing_Count/SUM) * 100;
+   Recreation_Share=((double)Recreation_Count/SUM) * 100;
+   Charity_Share=((double)Charity_Count/SUM) * 100;
+   Others_Share=((double)Others_Count/SUM) * 100;
+   system("cls");
+   printf("\n\n\nYour All time expense share ratio :\n\n\n-->Healthcare %24.3lf%%\n-->Food %30.3lf%%\n",Healthcare_Share,Food_Share);
+   printf("-->Personal Care & Cleaning %10.3lf%%\n-->Bills %29.3lf%%\n-->Rent & Mortgage %19.3lf%%\n",Care_Cleaning_Share,Bills_Share,Rent_Mortgage_Share);
+   printf("-->Loan Payment %22.3lf%%\n-->Education %25.3lf%%\n-->Transportation %20.3lf%%\n",Loan_Payment_Share,Education_Share,Transportation_Share);
+   printf("-->Clothing %26.3lf%%\n-->Recreation %24.3lf%%\n-->Charity %27.3lf%%\n-->Others %28.3lf%%",Clothing_Share,Recreation_Share,Charity_Share,Others_Share);
+   printf("\n\n\nPress any button to continue");
+   getch();
+   Return_To_Menu();
+}
+
+
+void Expense_Share_Ratio_In_Time_Period()
+{
+   system("cls");
+   char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+   char *end;
+   int Expense_Date;
+   long long int Healthcare_Count=0,Food_Count=0,Care_Cleaning_Count=0,Bills_Count=0,Rent_Mortgage_Count=0,Loan_Payment_Count=0,Education_Count=0;
+   long long int Transportation_Count=0,Clothing_Count=0,Recreation_Count=0,Charity_Count=0,Others_Count=0,SUM=0;
+   double Healthcare_Share=0,Food_Share=0,Care_Cleaning_Share=0,Bills_Share=0,Rent_Mortgage_Share=0,Loan_Payment_Share=0,Education_Share=0;
+   double Transportation_Share=0,Clothing_Share=0,Recreation_Share=0,Charity_Share=0,Others_Share=0;
+   struct UserExpense *head,*Expense_Temp;
+   head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+   head=Expense_Iteration();
+   Expense_Temp=head;
+   Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   while(Expense_Temp->next!=NULL)
+   {
+       Expense_Date=Check_Time_Period(Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+       if(Expense_Date==0)
+       {
+           if(strcasecmp(Expense_Temp->subject,"Healthcare\n")==0)
+                Healthcare_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Food\n")==0)
+                Food_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Personal Care & Cleaning\n")==0)
+                Care_Cleaning_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Bills\n")==0)
+                Bills_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Rent & Mortgage\n")==0)
+                Rent_Mortgage_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Loan Payment\n")==0)
+                Loan_Payment_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Education\n")==0)
+                Education_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Transportation\n")==0)
+                Transportation_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Clothing\n")==0)
+                Clothing_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Recreation\n")==0)
+                Recreation_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else if(strcasecmp(Expense_Temp->subject,"Charity\n")==0)
+                Charity_Count+=strtoull(Expense_Temp->amount,&end,10);
+           else
+                Others_Count+=strtoull(Expense_Temp->amount,&end,10);
+           SUM+=strtoull(Expense_Temp->amount,&end,10);
+       }
+       Expense_Temp=Expense_Temp->next;
+   }
+   Healthcare_Share=((double)Healthcare_Count/SUM) * 100;
+   Food_Share=((double)Food_Count/SUM) * 100;
+   Care_Cleaning_Share=((double)Care_Cleaning_Count/SUM) * 100;
+   Bills_Share=((double)Bills_Count/SUM) * 100;
+   Rent_Mortgage_Share=((double)Rent_Mortgage_Count/SUM) * 100;
+   Loan_Payment_Share=((double)Loan_Payment_Count/SUM) * 100;
+   Education_Share=((double)Education_Count/SUM) * 100;
+   Transportation_Share=((double)Transportation_Count/SUM) * 100;
+   Clothing_Share=((double)Clothing_Count/SUM) * 100;
+   Recreation_Share=((double)Recreation_Count/SUM) * 100;
+   Charity_Share=((double)Charity_Count/SUM) * 100;
+   Others_Share=((double)Others_Count/SUM) * 100;
+   system("cls");
+   printf("\n\n\nYour expense share ratio between %s/%s/%s and %s/%s/%s is :",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+   printf("\n\n\n-->Healthcare %24.3lf%%\n-->Food %30.3lf%%\n",Healthcare_Share,Food_Share);
+   printf("-->Personal Care & Cleaning %10.3lf%%\n-->Bills %29.3lf%%\n-->Rent & Mortgage %19.3lf%%\n",Care_Cleaning_Share,Bills_Share,Rent_Mortgage_Share);
+   printf("-->Loan Payment %22.3lf%%\n-->Education %25.3lf%%\n-->Transportation %20.3lf%%\n",Loan_Payment_Share,Education_Share,Transportation_Share);
+   printf("-->Clothing %26.3lf%%\n-->Recreation %24.3lf%%\n-->Charity %27.3lf%%\n-->Others %28.3lf%%",Clothing_Share,Recreation_Share,Charity_Share,Others_Share);
+   printf("\n\n\nPress any button to continue");
+   getch();
+   Return_To_Menu();
+}
+
+void Detailed_Expense_In_Time_Period()
+{
+    system("cls");
+    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+    char *end;
+    int Expense_Date,count=1;
+    struct UserExpense *head,*Expense_Temp;
+    head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    head=Expense_Iteration();
+    Expense_Temp=head;
+    Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+    system("cls");
+    while(Expense_Temp->next!=NULL)
+    {
+        Expense_Date=Check_Time_Period(Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+        if(Expense_Date==0)
+        {
+            printf("EXPENSE #%d\n\n",count);
+            Expense_Temp->amount[strlen(Expense_Temp->amount)-1]='\0';
+            printf("Amount = ",Expense_Temp->amount);
+            puts(Expense_Temp->amount);
+            Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+            printf("Subject : ");
+            puts(Expense_Temp->subject);
+            Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+            Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day);
+            Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Expense_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Expense_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+        }
+        Expense_Temp=Expense_Temp->next;
+    }
+    printf("\n\n\nPress enter to continue");
+    getch();
+    Return_To_Menu();
+}
+
+void Highest_Expense_In_Time_Period()
+{
+    system("cls");
+    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+    char *end;
+    int Expense_Date;
+    long long int Highest_Expense=0;
+    struct UserExpense *head,*Expense_Temp;
+    head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    head=Expense_Iteration();
+    Expense_Temp=head;
+    Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+    while(Expense_Temp->next!=NULL)
+    {
+        Expense_Date=Check_Time_Period(Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+        if(Expense_Date==0)
+        {
+            if(Highest_Expense==0)
+            {
+                Highest_Expense=strtoull(Expense_Temp->amount,&end,10);
+                Expense_Temp=Expense_Temp->next;
+                continue;
+            }
+            if(strtoull(Expense_Temp,&end,10)>Highest_Expense)
+                Highest_Expense=strtoull(Expense_Temp,&end,10);
+        }
+        Expense_Temp=Expense_Temp->next;
+    }
+    system("cls");
+    if(Highest_Expense==0)
+        printf("\n\n\nYou have not submitted any expense in this time period");
+    else
+        printf("\n\n\nYour highest expense between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Expense);
+    printf(" Iranian RIALS.\n\n\nPress any button to continue");
+    getch();
+    Return_To_Menu();
+}
+
+void Expense_Search_In_Description()
+{
+    system("cls");
+    struct UserExpense *head,*Expense_Temp;
+    head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    head=Expense_Iteration();
+    Expense_Temp=head;
+    char Word_In_Description[100];
+    int count=1;
+    printf("Please enter a word or phrase: ");
+    gets(Word_In_Description);
+    system("cls");
+    while(Expense_Temp->next!=NULL)
+    {
+        if(StrStrIA(Expense_Temp->description,Word_In_Description)!=NULL)
+        {
+            printf("EXPENSE #%d\n\n",count);
+            Expense_Temp->amount[strlen(Expense_Temp->amount)-1]='\0';
+            printf("Amount = ",Expense_Temp->amount);
+            puts(Expense_Temp->amount);
+            Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+            printf("Subject : ");
+            puts(Expense_Temp->subject);
+            Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+            Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day);
+            Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Expense_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Expense_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+        }
+        Expense_Temp=Expense_Temp->next;
+    }
+    printf("\n\n\nPress any button to continue");
     getch();
     Return_To_Menu();
 }
@@ -984,7 +1335,7 @@ int Expense_Iteration()
         head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
     }while(head==NULL);
     fgets(head->amount,sizeof head->amount,Expenses);
-    fgets(head->source,sizeof head->source,Expenses);
+    fgets(head->subject,sizeof head->subject,Expenses);
     fgets(head->Year,sizeof head->Year,Expenses);
     fgets(head->Month,sizeof head->Month,Expenses);
     fgets(head->Day,sizeof head->Day,Expenses);
@@ -998,7 +1349,7 @@ int Expense_Iteration()
             expense=(struct UserIncome*)malloc(sizeof(struct UserIncome));
         }while(expense==NULL);
         fgets(expense->amount,sizeof expense->amount,Expenses);
-        fgets(expense->source,sizeof expense->source,Expenses);
+        fgets(expense->subject,sizeof expense->subject,Expenses);
         fgets(expense->Year,sizeof expense->Year,Expenses);
         fgets(expense->Month,sizeof expense->Month,Expenses);
         fgets(expense->Day,sizeof expense->Day,Expenses);
@@ -1078,7 +1429,7 @@ void Choose_Source_Of_Income(int Source_Of_Income[])
 {
     char Choose_Source;
     int temp;
-    printf("\n\nPlease choose source of income :\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7) Other\n");
+    printf("\n\nPlease choose source of income :\n\n1) Salary\n2) Pocket Money\n3) Government Aid\n4) University Grant\n5) Bank Interest\n6) Loan\n7) Other\n\n\n");
     do
     {
         Choose_Source=getch();
@@ -1124,6 +1475,89 @@ void Choose_Source_Of_Income(int Source_Of_Income[])
             strcat(Source_Of_Income,"\n");
         }
    }
+}
+
+void Choose_Subject_Of_Expense(int Subject_Of_Expense[])
+{
+    char Choose_Subject;
+    int temp;
+    char *end;
+    printf("\n\nPlease choose subject of expense:\n\n1) Healthcare\n2) Daily expenses\n3) Monthly expenses\n");
+    printf("4) Education\n5) Clothing\n6) Recreation\n7) Charity\n8) Others\n\n\n");
+    do
+    {
+        Choose_Subject=getch();
+        temp=Choose_Subject - '0';
+    }while(temp<1 || temp>8);
+
+    switch(temp)
+    {
+        case 1:
+        {
+            strcpy(Subject_Of_Expense,"Healthcare\n");
+            break;
+        }
+        case 2:
+        {
+            system("cls");
+            printf("\n\n\n1) Food\n2) Personal Care & Cleaning\n3) Transportation\n\n\n");
+            do
+            {
+                Choose_Subject=getch();
+                temp=Choose_Subject - '0';
+            }while(temp<1 || temp>3);
+            if(temp==1)
+                strcpy(Subject_Of_Expense,"Food\n");
+            else if(temp==2)
+                strcpy(Subject_Of_Expense,"Personal Care & Cleaning\n");
+            else
+                strcpy(Subject_Of_Expense,"Transportation\n");
+            break;
+        }
+        case 3:
+        {
+            system("cls");
+            printf("\n\n\n1) Bills\n2) Rent & Mortgage\n3) Loan Payment\n\n\n");
+            do
+            {
+                Choose_Subject=getch();
+                temp=Choose_Subject - '0';
+            }while(temp<1 || temp>3);
+            if(temp==1)
+                strcpy(Subject_Of_Expense,"Bills\n");
+            else if(temp==2)
+                strcpy(Subject_Of_Expense,"Rent & Mortgage\n");
+            else
+                strcpy(Subject_Of_Expense,"Loan Payment\n");
+            break;
+        }
+        case 4:
+        {
+            strcpy(Subject_Of_Expense,"Education\n");
+            break;
+        }
+        case 5:
+        {
+            strcpy(Subject_Of_Expense,"Clothing\n");
+            break;
+        }
+        case 6:
+        {
+            strcpy(Subject_Of_Expense,"Recreation\n");
+            break;
+        }
+        case 7:
+        {
+            strcpy(Subject_Of_Expense,"Charity\n");
+            break;
+        }
+        default:
+        {
+            printf("Please enter subject of expense: ");
+            gets(Subject_Of_Expense);
+            strcat(Subject_Of_Expense,"\n");
+        }
+    }
 }
 
 
