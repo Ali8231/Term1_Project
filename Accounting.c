@@ -254,7 +254,7 @@ int User_Name_Search()
     temp=head;
     strcpy(temp_Username,g_username);
     strcat(temp_Username,"\n");
-    while(temp->next!=NULL)
+    while(temp!=NULL)
     {
         if(strcmp(temp->user_name,temp_Username)==0)
             return 0;//user name found
@@ -275,7 +275,7 @@ int Login_Pass_Check(int password[])
     strcpy(temp_Password,password);
     strcat(temp_Username,"\n");//in file last character of each element is a \n to go to next line.concatenation of \n is to match two strings for strcmp
     strcat(temp_Password,"\n");
-    while(temp->next!=NULL)//This is because all of my linked lists last nodes are always empty for unknown reasons.so I do not read the last nodes
+    while(temp!=NULL)
     {
         if((strcmp(temp_Username,temp->user_name)==0) && (strcmp(temp_Password,temp->password)==0))
             return 0;//pass found in profile
@@ -314,7 +314,19 @@ void Main_Menu()
             Reports();
             break;
         }
-
+        case '4':
+        {
+            Settings();
+            break;
+        }
+        case '5':
+        {
+            g_username[0]='/0';
+            Entrance_Menu();
+            break;
+        }
+        default:
+            Exit();
     }
 }
 
@@ -544,7 +556,7 @@ void Income_Search_In_Description()
     }
     printf("\n\n\nPress any button to continue");
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 void Highest_Income_In_Time_Period()
@@ -582,7 +594,7 @@ void Highest_Income_In_Time_Period()
         printf("\n\n\nYour highest income between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Income);
     printf(" Iranian RIALS.\n\n\nPress any button to continue");
     getch();//waits for user to press a key
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 void Detailed_Incomes_In_Time_Period()
@@ -625,7 +637,7 @@ void Detailed_Incomes_In_Time_Period()
     }
     printf("\n\n\nPress enter to continue");
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 
@@ -677,7 +689,7 @@ void Incomes_Share_Ratio_In_Time_Period()
    printf("Salary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\n",Salary_Share,Pocket_Share,Grant_Share,Gov_Aid_Share);
    printf("Loan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Loan_Share,Interest_Share,Others_Share);
    getch();
-   Return_To_Menu();//at the end user can go back to reports menu,main menu or exit
+   Return_To_Menu_For_Reports();//at the end user can go back to reports menu,main menu or exit
 }
 
 
@@ -722,7 +734,7 @@ void Incomes_Share_Ratio()
    printf("University Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\nLoan %22.3Lf%%\n",Grant_Share,Gov_Aid_Share,Loan_Share);
    printf("Bank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Interest_Share,Others_Share);
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 
@@ -754,7 +766,7 @@ void Specific_Income_In_Time_Period()
    printf("\n\n\nYour total income from %s between %s/%s/%s and %s/%s/%s\n",Source_Of_Income,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
    printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Income_Count);
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 
@@ -781,7 +793,7 @@ void Income_In_Time_Period()
    printf("\n\n\nYour total income between %s/%s/%s and %s/%s/%s\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
    printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Income_Count);
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 
@@ -805,7 +817,7 @@ void Annual_Income()
     }
     printf("Your income in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Income_Count);
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 
@@ -835,7 +847,7 @@ void Account_Balance()
     Balance=Income_Count-Expense_Count;
     printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 void Expense_Reports()
@@ -920,7 +932,7 @@ void Annual_Expense()
     }
     printf("Your expense amount in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Expense_Count);
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 
@@ -947,7 +959,7 @@ void Expense_In_Time_Period()
    printf("\n\n\nYour total expense between %s/%s/%s and %s/%s/%s\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
    printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Expense_Count);
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 void Specific_Expense_In_Time_Period()
@@ -978,7 +990,7 @@ void Specific_Expense_In_Time_Period()
    printf("\n\n\nYour total expense from %s between %s/%s/%s and %s/%s/%s\n",Subject_Of_Expense,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
    printf("is %lld Iranian RIALS.\n\n\nPress any button to continue",Expense_Count);
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 void Expense_Share_Ratio()
@@ -1041,7 +1053,7 @@ void Expense_Share_Ratio()
    printf("-->Clothing %26.3lf%%\n-->Recreation %24.3lf%%\n-->Charity %27.3lf%%\n-->Others %28.3lf%%",Clothing_Share,Recreation_Share,Charity_Share,Others_Share);
    printf("\n\n\nPress any button to continue");
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 
@@ -1113,7 +1125,7 @@ void Expense_Share_Ratio_In_Time_Period()
    printf("-->Clothing %26.3lf%%\n-->Recreation %24.3lf%%\n-->Charity %27.3lf%%\n-->Others %28.3lf%%",Clothing_Share,Recreation_Share,Charity_Share,Others_Share);
    printf("\n\n\nPress any button to continue");
    getch();
-   Return_To_Menu();
+   Return_To_Menu_For_Reports();
 }
 
 void Detailed_Expense_In_Time_Period()
@@ -1156,7 +1168,7 @@ void Detailed_Expense_In_Time_Period()
     }
     printf("\n\n\nPress enter to continue");
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 void Highest_Expense_In_Time_Period()
@@ -1194,7 +1206,7 @@ void Highest_Expense_In_Time_Period()
         printf("\n\n\nYour highest expense between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Expense);
     printf(" Iranian RIALS.\n\n\nPress any button to continue");
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
 }
 
 void Expense_Search_In_Description()
@@ -1236,7 +1248,225 @@ void Expense_Search_In_Description()
     }
     printf("\n\n\nPress any button to continue");
     getch();
-    Return_To_Menu();
+    Return_To_Menu_For_Reports();
+}
+
+void Settings()
+{
+    system("cls");
+    char Choose_Menu;
+    int temp;
+    printf("----- SETTINGS MENU -----\n\n\n1) Change user name\n2) Change password\n3) Change phone number\n4) Change Email address\n\n\n");
+    do
+    {
+        Choose_Menu=getch();
+        temp=Choose_Menu-'0';
+    }while(temp<1 || temp>4);
+    switch(temp)
+    {
+        case 1:
+        {
+            Change_Username();
+            break;
+        }
+        case 2:
+        {
+            Change_Password();
+            break;
+        }
+        case 3:
+        {
+            Change_Phone_Number();
+            break;
+        }
+        default:
+            Change_Email();
+    }
+}
+
+void Change_Email()
+{
+    system("cls");
+    char New_Email[50],Temp_Username[30];
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    FILE *profile;
+    printf("\n\n\nEnter new Email address: ");
+    gets(New_Email);
+    strcat(New_Email,"\n");
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    profile=fopen("profile.txt","w");
+    while(temp!=NULL)
+    {
+        fputs(temp->name,profile);
+        fputs(temp->family,profile);
+        fputs(temp->user_name,profile);
+        fputs(temp->password,profile);
+        fputs(temp->Melli_Num,profile);
+        fputs(temp->Phone_Num,profile);
+        if(strcmp(Temp_Username,temp->user_name)==0)
+            fputs(New_Email,profile);
+        else
+            fputs(temp->Email,profile);
+        temp=temp->next;
+    }
+    fclose(profile);
+    Return_To_Menu_For_Settings();
+}
+
+
+
+void Change_Phone_Number()
+{
+    system("cls");
+    char New_Phone_Num[20],Temp_Username[30];
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    FILE *profile;
+    printf("\n\n\nEnter new phone number: ");
+    gets(New_Phone_Num);
+    strcat(New_Phone_Num,"\n");
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    profile=fopen("profile.txt","w");
+    while(temp!=NULL)
+    {
+        fputs(temp->name,profile);
+        fputs(temp->family,profile);
+        fputs(temp->user_name,profile);
+        fputs(temp->password,profile);
+        fputs(temp->Melli_Num,profile);
+        if(strcmp(Temp_Username,temp->user_name)==0)
+            fputs(New_Phone_Num,profile);
+        else
+            fputs(temp->Phone_Num,profile);
+        fputs(temp->Email,profile);
+        temp=temp->next;
+    }
+    fclose(profile);
+    Return_To_Menu_For_Settings();
+}
+
+
+void Change_Password()
+{
+    system("cls");
+    char New_Password[30],Old_Password[30],Confirm_Old_Password[30],Repeat_New_Password[30],Temp_Username[30],Temp_Password[30];
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    FILE *profile;
+    printf("\n\n\nEnter old password: ");
+    Enter_Pass(Old_Password);
+    strcat(Old_Password,"\n");
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    do
+    {
+        while(temp->next!=NULL)
+        {
+            if(strcmp(Temp_Username,temp->user_name)==0)
+            {
+                puts(temp->user_name);
+                puts(temp->password);
+                strcpy(Confirm_Old_Password,temp->password);
+            }
+            temp=temp->next;
+        }
+        temp=head;
+        if(strcmp(Old_Password,Confirm_Old_Password)!=0)
+        {
+            printf("\nPassword is not correct.\nPlease Enter the old password: ");
+            Enter_Pass(Old_Password);
+            strcat(Old_Password,"\n");
+        }
+    }while(strcmp(Old_Password,Confirm_Old_Password)!=0);
+    printf("\n\nEnter new password: ");
+    Enter_Pass(New_Password);
+    printf("\nRepeat new password: ");
+    Enter_Pass(Repeat_New_Password);
+    do
+    {
+       if(strcmp(New_Password,Repeat_New_Password)!=0)
+       {
+           printf("\nPassword is not the same.\nPlease Enter the same password: ");
+           Enter_Pass(Repeat_New_Password);
+       }
+    }while(strcmp(New_Password,Repeat_New_Password)!=0);
+    strcat(New_Password,"\n");
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    profile=fopen("profile.txt","w");
+    while(temp!=NULL)
+    {
+        fputs(temp->name,profile);
+        fputs(temp->family,profile);
+        fputs(temp->user_name,profile);
+        if(strcmp(Temp_Username,temp->user_name)==0)
+            fputs(New_Password,profile);
+        else
+            fputs(temp->password,profile);
+        fputs(temp->Melli_Num,profile);
+        fputs(temp->Phone_Num,profile);
+        fputs(temp->Email,profile);
+        temp=temp->next;
+    }
+    fclose(profile);
+    Return_To_Menu_For_Settings();
+}
+
+
+void Change_Username()
+{
+    system("cls");
+    char New_Username[30],Temp_Username[30],Old_Directory[80],New_Directory[80];
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    FILE *profile;
+    printf("\n\n\nEnter new user name: ");
+    gets(New_Username);
+    strcpy(Old_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(Old_Directory,g_username);
+    strcat(Old_Directory,".txt");
+    strcpy(New_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(New_Directory,New_Username);
+    strcat(New_Directory,".txt");
+    rename(Old_Directory,New_Directory);
+    strcpy(Old_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(Old_Directory,g_username);
+    strcat(Old_Directory,".txt");
+    strcpy(New_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(New_Directory,New_Username);
+    strcat(New_Directory,".txt");
+    rename(Old_Directory,New_Directory);
+    strcat(New_Username,"\n");
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    profile=fopen("profile.txt","w");
+    while(temp!=NULL)
+    {
+        fputs(temp->name,profile);
+        fputs(temp->family,profile);
+        if(strcmp(Temp_Username,temp->user_name)==0)
+            fputs(New_Username,profile);
+        else
+            fputs(temp->user_name,profile);
+        fputs(temp->password,profile);
+        fputs(temp->Melli_Num,profile);
+        fputs(temp->Phone_Num,profile);
+        fputs(temp->Email,profile);
+        temp=temp->next;
+    }
+    fclose(profile);
+    Return_To_Menu_For_Settings();
 }
 
 
@@ -1406,7 +1636,26 @@ void Input_Time_Period(int Begin_Year[],int Begin_Month[],int Begin_Day[],int En
    gets(End_Day);
 }
 
-void Return_To_Menu()
+void Return_To_Menu_For_Settings()
+{
+    int temp;
+    char Menu_Choose;
+    system("cls");
+    printf("\n\n1) Return to main menu\n2) Return to settings\n3) Exit");
+    do
+    {
+        Menu_Choose=getch();
+        temp=Menu_Choose-'0';
+    }while(temp<1 || temp>3);
+    if(Menu_Choose=='1')
+        Main_Menu();
+    else if(Menu_Choose=='2')
+        Settings();
+         else
+             Exit();
+}
+
+void Return_To_Menu_For_Reports()
 {
     int temp;
     char Menu_Choose;
