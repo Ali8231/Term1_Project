@@ -534,16 +534,54 @@ void Submit_Income()
     Incomes=fopen(Incomes_Directory,"a");
     printf("----- INCOME SUBMIT -----\n\n\nEnter amount of income in Iranian RIAL currency: ");
     gets(Income_Amount);
+    do
+      {
+        temp=Money_Amount_Check(Income_Amount);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.Amount must only be in numbers\nEnter Amount: ");
+            gets(Income_Amount);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nAmount isn't in range.Amount must be between 0 and 9 quintillion\nEnter Amount: ");
+            gets(Income_Amount);
+        }
+    }while(temp!=0);
     strcat(Income_Amount,"\n");
     Choose_Source_Of_Income(Source_Of_Income);
-    printf("Please enter year of income in YYYY format: ");
+    printf("\nPlease note that date must be entered in Iranian calender\n\nPlease enter year of income in YYYY format: ");
     gets(Year_Of_Income);
-    strcat(Year_Of_Income,"\n");
     printf("Please enter month of income in MM format(without zero): ");
     gets(Month_Of_Income);
-    strcat(Month_Of_Income,"\n");
     printf("Please enter day of income in DD format(without zero): ");
     gets(Day_Of_Income);
+    do
+      {
+        temp=Date_Check(Year_Of_Income,Month_Of_Income,Day_Of_Income);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.Date must be entered in numbers.\n\n");
+            printf("Please enter year of income in YYYY format: ");
+            gets(Year_Of_Income);
+            printf("Please enter month of income in MM format(without zero): ");
+            gets(Month_Of_Income);
+            printf("Please enter day of income in DD format(without zero): ");
+            gets(Day_Of_Income);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nDate is not in range.Date should not be further than current date or before 1300\n\n");
+            printf("Please enter year of income in YYYY format: ");
+            gets(Year_Of_Income);
+            printf("Please enter month of income in MM format(without zero): ");
+            gets(Month_Of_Income);
+            printf("Please enter day of income in DD format(without zero): ");
+            gets(Day_Of_Income);
+        }
+    }while(temp!=0);
+    strcat(Year_Of_Income,"\n");
+    strcat(Month_Of_Income,"\n");
     strcat(Day_Of_Income,"\n");
     printf("Please enter a short(one line) description: ");
     gets(Income_Description);
@@ -626,6 +664,73 @@ void Submit_Expense()
     else
         Main_Menu();
 }
+
+int Date_Check(char *Year,char *Month,char *Day)
+{
+    char *end;
+    int i=0,temp=0;
+    long Current_Year=0,Current_Month=0,Current_Day=0;
+    if(strlen(Year)!=4)
+        return -1;
+    if(strlen(Month)!=1 && strlen(Month)!=2)
+        return -1;
+    if(strlen(Day)!=1 && strlen(Day)!=2)
+        return -1;
+    if(Year[0]=='0' || Month[0]=='0' || Day[0]=='0')
+        return -1;
+    for(i=0;i<strlen(Year);i++)
+    {
+        temp=Year[i];
+        if(temp<48 || temp>57)
+            return -1;
+    }
+    for(i=0;i<strlen(Month);i++)
+    {
+        temp=Month[i];
+        if(temp<48 || temp>57)
+            return -1;
+    }
+    for(i=0;i<strlen(Day);i++)
+    {
+        temp=Day[i];
+        if(temp<48 || temp>57)
+            return -1;
+    }
+    if(atoi(Day)>31 || atoi(Month)>12)
+        return -1;
+    Current_Year=1348 + (time(NULL)/31536000);
+    Current_Month=10 + (time(NULL)%31536000)/2628000;
+    Current_Day=((time(NULL)%31536000)%2628000)/86400;
+    if(strtol(Year,&end,10)>=1300  &&   strtol(Year,&end,10)<=Current_Year)
+        if(strtol(Year,&end,10)==Current_Year)
+        {
+            if(strtol(Month,&end,10)>Current_Month)
+                return -2;
+            if(strtol(Month,&end,10)==Current_Month)
+                if(strtol(Day,&end,10)>Current_Day)
+                    return -2;
+        }
+
+    else
+        return -2;
+    return 0;
+}
+
+
+int Money_Amount_Check(char *Amount)
+{
+    int i=0,temp=0;
+    for(i=0;i<strlen(Amount);i++)
+    {
+        temp=Amount[i];
+        if(temp<48 || temp>57)
+            return -1;
+    }
+    if(strlen(Amount)>19)
+        return -2;
+    return 0;
+}
+
 
 void Reports()
 {
