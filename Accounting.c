@@ -44,6 +44,7 @@ struct UserExpense
 
 char g_username[20];
 
+int Check_Year_For_Annual_Statement(char *Year);
 int Email_Check(char *Email);
 int Phone_Num_Check(char *Phone_Num);
 int Melli_Num_Check(char *Melli_Num);
@@ -742,6 +743,25 @@ int Date_Check(char *Year,char *Month,char *Day)
     return 0;
 }
 
+int Check_Year_For_Annual_Statement(char *Year)
+{
+    int i=0,temp=0,Current_Year=0;
+    char *end;
+    if(strlen(Year)!=4 || Year[0]=='0')
+        return -1;
+    for(i=0;i<strlen(Year);i++)
+    {
+        temp=Year[i];
+        if(temp<48 || temp>57)
+            return -1;
+    }
+    Current_Year=1348 + (time(NULL)/31536000);
+    if(strtol(Year,&end,10)>=1300  &&   strtol(Year,&end,10)<=Current_Year)
+        return 0;
+    else
+        return -2;
+}
+
 
 int Money_Amount_Check(char *Amount)
 {
@@ -1123,6 +1143,7 @@ void Annual_Income()
 {
     system("cls");
     struct UserIncome *head,*Income_Temp;
+    int temp=0;
     char Year[6];
     char *end;
     long long int Income_Count=0;
@@ -1131,12 +1152,27 @@ void Annual_Income()
     Income_Temp=head;
     printf("Please enter a year: ");
     gets(Year);
+    do
+    {
+        temp=Check_Year_For_Annual_Statement(Year);
+        if(temp==-1)
+        {
+            printf("\nFormat is not correct.Year must be entered in numbers\nEnter Year: ");
+            gets(Year);
+        }
+        if(temp==-2)
+        {
+            printf("\nYear is not in range.Year should not be further than current year or before 1300\nEnter Year: ");
+            gets(Year);
+        }
+    }while(temp!=0);
     while(Income_Temp->next!=NULL)
     {
         if(strtol(Income_Temp->Year,&end,10)==strtol(Year,&end,10))
             Income_Count+=strtoull(Income_Temp->amount,&end,10);
         Income_Temp=Income_Temp->next;
     }
+    system("cls");
     printf("Your income in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Income_Count);
     getch();
     Return_To_Menu_For_Reports();
@@ -1238,6 +1274,7 @@ void Annual_Expense()
 {
     system("cls");
     struct UserExpense *head,*Expense_Temp;
+    int temp=0;
     char Year[6];
     char *end;
     long long int Expense_Count=0;
@@ -1246,12 +1283,27 @@ void Annual_Expense()
     Expense_Temp=head;
     printf("Please enter a year: ");
     gets(Year);
+    do
+    {
+        temp=Check_Year_For_Annual_Statement(Year);
+        if(temp==-1)
+        {
+            printf("\nFormat is not correct.Year must be entered in numbers\nEnter Year: ");
+            gets(Year);
+        }
+        if(temp==-2)
+        {
+            printf("\nYear is not in range.Year should not be further than current year or before 1300\nEnter Year: ");
+            gets(Year);
+        }
+    }while(temp!=0);
     while(Expense_Temp->next!=NULL)
     {
         if(strtol(Expense_Temp->Year,&end,10)==strtol(Year,&end,10))
             Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
         Expense_Temp=Expense_Temp->next;
     }
+    system("cls");
     printf("Your expense amount in %s is %lld Iranian RIALS.\n\nPress any button to continue",Year,Expense_Count);
     getch();
     Return_To_Menu_For_Reports();
