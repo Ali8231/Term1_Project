@@ -787,13 +787,15 @@ void Reports()
     do
     {
         Report_Type_Choice=getch();
+        if(Report_Type_Choice==8)
+            Main_Menu();
         temp=Report_Type_Choice - '0';
     }while(temp<1 || temp>3);
     if(Report_Type_Choice=='1')
         Account_Balance();
     else if(Report_Type_Choice=='2')
         Income_Reports();
-    else
+    else if(Report_Type_Choice=='3')
         Expense_Reports();
 }
 
@@ -808,6 +810,8 @@ void Income_Reports()
     do
     {
         Income_Report_Type=getch();
+        if(Income_Report_Type==8)
+            Reports();
         temp=Income_Report_Type-'0';
     }while(temp<1 || temp>7);
     switch(Income_Report_Type)
@@ -834,6 +838,8 @@ void Income_Reports()
             do
             {
                 Income_Report_Type=getch();
+                if(Income_Report_Type==8)
+                    Income_Reports();
                 temp=Income_Report_Type-'0';
             }while(temp!=1 && temp!=2);
             if(Income_Report_Type=='1')
@@ -1219,6 +1225,8 @@ void Expense_Reports()
     do
     {
         Expense_Report_Type=getch();
+        if(Expense_Report_Type==8)
+            Reports();
         temp=Expense_Report_Type-'0';
     }while(temp<1 || temp>7);
     switch(Expense_Report_Type)
@@ -1245,6 +1253,8 @@ void Expense_Reports()
             do
             {
                 Expense_Report_Type=getch();
+                if(Expense_Report_Type==8)
+                    Expense_Reports();
                 temp=Expense_Report_Type-'0';
             }while(temp!=1 && temp!=2);
             if(Expense_Report_Type=='1')
@@ -1634,6 +1644,8 @@ void Settings()
     do
     {
         Choose_Menu=getch();
+        if(Choose_Menu==8)
+            Main_Menu();
         temp=Choose_Menu-'0';
     }while(temp<1 || temp>4);
     switch(temp)
