@@ -44,6 +44,8 @@ struct UserExpense
 
 char g_username[20];
 
+int User_Name_Check(int username[]);
+int Password_Check(char *password);
 void Submit_Income();
 void Entrance_Menu();
 void Signup();
@@ -97,6 +99,7 @@ void Signup()
 {
     system("cls");
     char name[20],family[25],user_name[20],password[21],Confirm_Pass[21],Melli_Num[12],Phone_Num[13],Email[40];
+    int temp;
     FILE *profile,*UserIncome,*UserExpense;
     profile=fopen("profile.txt","a");
     printf("-----SIGN UP PAGE-----\n\n\nEnter your first name: ");
@@ -106,32 +109,54 @@ void Signup()
     printf("Enter your last name: ");
     gets(family);
     strcat(family,"\n");
-    printf("Enter user name: ");
+    printf("\n\nNotes about user name:\n--Your User name must be between 3 and 15 characters\n");
+    printf("--Your User name must be unique.");
+    printf("\n\nEnter user name: ");
     gets(user_name);
-    //do
-    //{
-    //    UserNameCheck(username);
-    //    if(UserNameCheck==0)
-    //    {
-    //        printf("There is a user with this username.\nEnter another user name: ");
-    //        gets(username);
-    //    }
-    //}while(UserNameCheck==0);
+    do
+    {
+        temp=User_Name_Check(user_name);
+        if(temp==-1)
+        {
+            printf("\n\nUser name is too short.\nEnter a longer user name: ");
+            gets(user_name);
+        }
+        else if(temp==-2)
+        {
+            printf("\n\nUser name is too long.\nEnter a shorter user name: ");
+            gets(user_name);
+        }
+        else if(temp==-3)
+        {
+            printf("\n\nThere's another user with this user name.\nEnter another user name: ");
+            gets(user_name);
+        }
+    }while(temp!=0);
     printf("\n");
     strcat(user_name,"\n");
-    printf("\n\nNotes about password:\n---Your password must be between 8 and 20 characters\n---");
+    printf("\n\nNotes about password:\n--Your password must be between 8 and 20 characters\n--");
     printf("Your password must include uppercase and lowercase letters,at least one\n number and one special character(@,*,#,...)\n\nEnter password: ");
     Enter_Pass(password);
-    //do
-    //{
-    //    PassCheck(password);
-    //    if(PassCheck==0)
-    //    {
-    //        printf("Your password isn't strong.\nPlease read the notes again and enter an strong password: ");
-    //        gets(password);
-    //    }
-    //}while(PassCheck==0);
-    printf("\nEnter the password again: ");
+    do
+    {
+        temp=Password_Check(password);
+        if(temp==-1)
+        {
+            printf("\n\nYour password is too short.\nEnter a longer password: ");
+            Enter_Pass(password);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nYour password is too long.\nEnter a shorter password: ");
+            Enter_Pass(password);
+        }
+        if(temp==-3)
+        {
+            printf("\n\nYour password is weak\nEnter a stronger password (according to notes): ");
+            Enter_Pass(password);
+        }
+    }while(temp!=0);
+    printf("\n\nEnter the password again: ");
     Enter_Pass(Confirm_Pass);
     do
     {
@@ -192,16 +217,73 @@ void Signup()
     Entrance_Menu();
 }
 
+int Password_Check(char *password)
+{
+    int i=0,temp=0,Upper_Case_Check=0,Lower_Case_Check=0,Special_Char_Check=0,Number_Check=0;//for checking how many numbers,special chars and letters are in pass
+    if(strlen(password)<8)
+        return -1;//password is too short
+    if(strlen(password)>20)
+        return -2;//password is too long
+    for(i=0;i<strlen(password);i++)
+    {
+        temp=password[i];
+        if(temp>=33 && temp<=47)//special chars
+            Special_Char_Check++;
+        else if(temp>=58 && temp<=64)//special chars
+            Special_Char_Check++;
+        else if(temp>=91 && temp<=96)//special chars
+            Special_Char_Check++;
+        else if(temp>=123 && temp<=126)//special chars
+            Special_Char_Check++;
+        else if(temp>=48 && temp<=57)//numbers
+            Number_Check++;
+        else if(temp>=65 && temp<=90)//upper case letters
+            Upper_Case_Check++;
+        else if(temp>=97 && temp<=122)//lower case letters
+            Lower_Case_Check++;
+    }
+    if(Special_Char_Check==0 || Number_Check==0 || Upper_Case_Check==0 || Lower_Case_Check==0)
+        return -3;
+    return 0;
+}
+
+int User_Name_Check(int username[])
+{
+    char Temp_Username[20];
+    FILE *profile;
+    profile=fopen("profile.txt","r");
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    if(strlen(username)<3)
+        return -1;//length of user name is too short
+    if(strlen(username)>15)
+        return -2;//length of user name is too long
+    strcpy(Temp_Username,username);
+    strcat(Temp_Username,"\n");
+    while(temp!=NULL)
+    {
+        if(strcasecmp(temp->user_name,Temp_Username)==0)
+            return -3;//user name is not unique
+        temp=temp->next;
+    }
+    fclose(profile);
+    return 0;//user name is OK
+}
+
+
+
 void Enter_Pass(char *password)
 {
     char temp;
     int i=0;
     while((temp=getch())!=13)//until user presses enter
     {
-        if(i<0)
-            i++;
         if(temp==8)//if user presses backspace
         {
+            if(i==0)
+                continue;
             printf("\b \b");//destructive /b
             i--;
             continue;
