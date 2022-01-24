@@ -60,7 +60,7 @@ int Profile_Iteration();
 void Enter_Pass(char *password);
 void Submit_Expense();
 void Reports();
-void Input_Time_Period(int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[]);
+void Input_Time_Period(char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day);
 int Check_Time_Period(int Year[],int Month[],int Day[],int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[]);
 
 
@@ -625,6 +625,20 @@ void Submit_Expense()
     Expenses=fopen(Expenses_Directory,"a");
     printf("----- EXPENSE SUBMIT -----\n\n\nEnter amount of expenditure in Iranian RIAL currency: ");
     gets(Expense_Amount);
+    do
+      {
+        temp=Money_Amount_Check(Expense_Amount);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.Amount must only be in numbers\nEnter Amount: ");
+            gets(Expense_Amount);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nAmount isn't in range.Amount must be between 0 and 9 quintillion\nEnter Amount: ");
+            gets(Expense_Amount);
+        }
+    }while(temp!=0);
     strcat(Expense_Amount,"\n");
     Choose_Subject_Of_Expense(Subject_Of_Expense);
     printf("Please enter year of expenditure in YYYY format: ");
@@ -702,14 +716,26 @@ int Date_Check(char *Year,char *Month,char *Day)
     Current_Month=10 + (time(NULL)%31536000)/2628000;
     Current_Day=((time(NULL)%31536000)%2628000)/86400;
     if(strtol(Year,&end,10)>=1300  &&   strtol(Year,&end,10)<=Current_Year)
+    {
         if(strtol(Year,&end,10)==Current_Year)
         {
             if(strtol(Month,&end,10)>Current_Month)
                 return -2;
             if(strtol(Month,&end,10)==Current_Month)
+            {
                 if(strtol(Day,&end,10)>Current_Day)
                     return -2;
+                else
+                    return 0;
+            }
+
+            else
+                return 0;
         }
+        else
+            return 0;
+    }
+
 
     else
         return -2;
@@ -1981,20 +2007,69 @@ int Check_Time_Period(int Year[],int Month[],int Day[],int Begin_Year[],int Begi
     return 0;//income in time period
 }
 
-void Input_Time_Period(int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[])
+void Input_Time_Period(char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day)
 {
-   printf("Enter beginning year in YYYY format: ");
-   gets(Begin_Year);
-   printf("Enter beginning month in MM format (without zero): ");
-   gets(Begin_Month);
-   printf("Enter beginning day in DD format (without zero): ");
-   gets(Begin_Day);
-   printf("\n\n\nEnter ending year in YYYY format: ");
-   gets(End_Year);
-   printf("Enter ending month in MM format (without zero): ");
-   gets(End_Month);
-   printf("Enter ending day in DD format (without zero): ");
-   gets(End_Day);
+    int temp=0;
+    printf("Enter beginning year in YYYY format: ");
+    gets(Begin_Year);
+    printf("Enter beginning month in MM format (without zero): ");
+    gets(Begin_Month);
+    printf("Enter beginning day in DD format (without zero): ");
+    gets(Begin_Day);
+    do
+    {
+         temp=Date_Check(Begin_Year,Begin_Month,Begin_Day);
+         if(temp==-1)
+         {
+             printf("\n\nFormat is not correct.Date must be entered in numbers.\n\n\n");
+             printf("Enter beginning year in YYYY format: ");
+             gets(Begin_Year);
+             printf("Enter beginning month in MM format (without zero): ");
+             gets(Begin_Month);
+             printf("Enter beginning day in DD format (without zero): ");
+             gets(Begin_Day);
+         }
+         if(temp==-2)
+         {
+             printf("\n\nDate is not in range.Date should not be further than current date or before 1300\n\n\n");
+             printf("Enter beginning year in YYYY format: ");
+             gets(Begin_Year);
+             printf("Enter beginning month in MM format (without zero): ");
+             gets(Begin_Month);
+             printf("Enter beginning day in DD format (without zero): ");
+             gets(Begin_Day);
+         }
+    }while(temp!=0);
+    printf("\n\n\nEnter ending year in YYYY format: ");
+    gets(End_Year);
+    printf("Enter ending month in MM format (without zero): ");
+    gets(End_Month);
+    printf("Enter ending day in DD format (without zero): ");
+    gets(End_Day);
+    do
+    {
+         temp=Date_Check(End_Year,End_Month,End_Day);
+         if(temp==-1)
+         {
+             printf("\n\nFormat is not correct.Date must be entered in numbers.\n\n\n");
+             printf("Enter ending year in YYYY format: ");
+             gets(End_Year);
+             printf("Enter ending month in MM format (without zero): ");
+             gets(End_Month);
+             printf("Enter ending day in DD format (without zero): ");
+             gets(End_Day);
+         }
+         if(temp==-2)
+         {
+             printf("\n\nDate is not in range.Date should not be further than current date or before 1300\n\n\n");
+             printf("Enter ending year in YYYY format: ");
+             gets(End_Year);
+             printf("Enter ending month in MM format (without zero): ");
+             gets(End_Month);
+             printf("Enter ending day in DD format (without zero): ");
+             gets(End_Day);
+         }
+    }while(temp!=0);
 }
 
 void Return_To_Menu_For_Settings()
