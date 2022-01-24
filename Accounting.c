@@ -44,7 +44,10 @@ struct UserExpense
 
 char g_username[20];
 
-int User_Name_Check(int username[]);
+int Email_Check(char *Email);
+int Phone_Num_Check(char *Phone_Num);
+int Melli_Num_Check(char *Melli_Num);
+int User_Name_Check(char *username);
 int Password_Check(char *password);
 void Submit_Income();
 void Entrance_Menu();
@@ -169,39 +172,54 @@ void Signup()
     strcat(password,"\n");
     printf("\nEnter your Melli number: ");
     gets(Melli_Num);
-    //do
-    //  {
-    //    MelliNumCheck(MelliNum);
-    //    if(MelliNumCheck==0)
-    //    {
-    //        printf("Melli number is not correct.\nEnter a correct Melli number: ");
-    //        gets(MelliNum);
-    //    }
-    //}while(MelliNumCheck==0);
+    do
+      {
+        temp=Melli_Num_Check(Melli_Num);
+        if(temp==-1)
+        {
+            printf("\n\nMelli number is not correct.\nEnter a valid Melli number: ");
+            gets(Melli_Num);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nThis person has signed up before.\nEnter another Melli number: ");
+            gets(Melli_Num);
+        }
+    }while(temp!=0);
     strcat(Melli_Num,"\n");
     printf("Enter your phone number: ");
     gets(Phone_Num);
-    //do
-    //  {
-    //    PhoneNumCheck(PhoneNum);
-    //    if(PhoneNumCheck==0)
-    //    {
-    //        printf("Phone number is not correct.\nEnter a correct phone number: ");
-    //        gets(PhoneNum);
-    //    }
-    //}while(PhoneNumCheck==0);
+    do
+      {
+        temp=Phone_Num_Check(Phone_Num);
+        if(temp==-1)
+        {
+            printf("\n\nPhone number is not correct.\nEnter a valid phone number: ");
+            gets(Phone_Num);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nThis Phone number is used by another user.\nEnter another phone number: ");
+            gets(Phone_Num);
+        }
+    }while(temp!=0);
     strcat(Phone_Num,"\n");
     printf("Enter your Email address: ");
     gets(Email);
-    //do
-    //  {
-    //    EmailCheck(Email);
-    //    if(EmailCheck==0)
-    //    {
-    //        printf("Email address is not correct.\nEnter a correct Email address: ");
-    //        gets(Email);
-    //    }
-    //}while(EmailCheck==0);
+    do
+      {
+        temp=Email_Check(Email);
+        if(temp==-1)
+        {
+            printf("\n\nEmail address is not correct.\nEnter a valid Email address: ");
+            gets(Email);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nThis Email address is used by another user.\nEnter another Email address: ");
+            gets(Email);
+        }
+    }while(temp!=0);
     strcat(Email,"\n");
     fputs(name,profile);
     fputs(family,profile);
@@ -216,6 +234,97 @@ void Signup()
     sleep(1);
     Entrance_Menu();
 }
+
+int Email_Check(char *Email)
+{
+    int i=0,At_Sign_Check=0,Dot_Check=0;
+    char Temp_Email[42];
+    FILE *profile;
+    profile=fopen("profile.txt","r");
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    for(i=0;i<strlen(Email);i++)
+    {
+        if(Email[i]=='@')
+            At_Sign_Check++;
+        if(Email[i]=='.')
+            Dot_Check++;
+    }
+    if(At_Sign_Check==0 || Dot_Check==0)
+        return -1;
+    strcpy(Temp_Email,Email);
+    strcat(Temp_Email,"\n");
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->Email,Temp_Email)==0)
+            return -2;
+        temp=temp->next;
+    }
+    return 0;
+}
+
+
+int Phone_Num_Check(char *Phone_Num)
+{
+    int i=0,Int_Temp=0;
+    char Temp_Phone_Num[12];
+    FILE *profile;
+    profile=fopen("profile.txt","r");
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    if(strlen(Phone_Num)!=11 || Phone_Num[0]!='0' || Phone_Num[1]!='9')
+        return -1;
+    for(i=0;i<strlen(Phone_Num);i++)
+    {
+        Int_Temp=Phone_Num[i];
+        if(Int_Temp<48 || Int_Temp>57)
+            return -1;
+    }
+    strcpy(Temp_Phone_Num,Phone_Num);
+    strcat(Temp_Phone_Num,"\n");
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->Phone_Num,Temp_Phone_Num)==0)
+            return -2;
+        temp=temp->next;
+    }
+    return 0;
+}
+
+
+int Melli_Num_Check(char *Melli_Num)
+{
+    int i=0,Int_Temp=0;
+    char Temp_Melli_Num[13];
+    FILE *profile;
+    profile=fopen("profile.txt","r");
+    struct UserProfile *head,*temp;
+    head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    head=Profile_Iteration();
+    temp=head;
+    if(strlen(Melli_Num)!=10)
+        return -1;
+    for(i=0;i<strlen(Melli_Num);i++)
+    {
+        Int_Temp=Melli_Num[i];
+        if(Int_Temp<48 || Int_Temp>57)
+            return -1;
+    }
+    strcpy(Temp_Melli_Num,Melli_Num);
+    strcat(Temp_Melli_Num,"\n");
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->Melli_Num,Temp_Melli_Num)==0)
+            return -2;
+        temp=temp->next;
+    }
+    return 0;
+}
+
 
 int Password_Check(char *password)
 {
@@ -247,7 +356,7 @@ int Password_Check(char *password)
     return 0;
 }
 
-int User_Name_Check(int username[])
+int User_Name_Check(char *username)
 {
     char Temp_Username[20];
     FILE *profile;
@@ -1369,6 +1478,7 @@ void Settings()
 void Change_Email()
 {
     system("cls");
+    int Int_Temp=0;
     char New_Email[50],Temp_Username[30];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
@@ -1377,6 +1487,20 @@ void Change_Email()
     FILE *profile;
     printf("\n\n\nEnter new Email address: ");
     gets(New_Email);
+    do
+      {
+        Int_Temp=Email_Check(New_Email);
+        if(Int_Temp==-1)
+        {
+            printf("\n\nEmail address is not correct.\nEnter a valid Email address: ");
+            gets(New_Email);
+        }
+        if(Int_Temp==-2)
+        {
+            printf("\n\nThis Email address is used by another user.\nEnter another Email address: ");
+            gets(New_Email);
+        }
+    }while(Int_Temp!=0);
     strcat(New_Email,"\n");
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
@@ -1404,6 +1528,7 @@ void Change_Email()
 void Change_Phone_Number()
 {
     system("cls");
+    int Int_Temp=0;
     char New_Phone_Num[20],Temp_Username[30];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
@@ -1412,6 +1537,20 @@ void Change_Phone_Number()
     FILE *profile;
     printf("\n\n\nEnter new phone number: ");
     gets(New_Phone_Num);
+    do
+      {
+        Int_Temp=Phone_Num_Check(New_Phone_Num);
+        if(Int_Temp==-1)
+        {
+            printf("\n\nPhone number is not correct.\nEnter a valid phone number: ");
+            gets(New_Phone_Num);
+        }
+        if(Int_Temp==-2)
+        {
+            printf("\n\nThis Phone number is used by another user.\nEnter another phone number: ");
+            gets(New_Phone_Num);
+        }
+    }while(Int_Temp!=0);
     strcat(New_Phone_Num,"\n");
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
@@ -1438,6 +1577,7 @@ void Change_Phone_Number()
 void Change_Password()
 {
     system("cls");
+    int Int_Temp=0;
     char New_Password[30],Old_Password[30],Confirm_Old_Password[30],Repeat_New_Password[30],Temp_Username[30],Temp_Password[30];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
@@ -1454,11 +1594,7 @@ void Change_Password()
         while(temp->next!=NULL)
         {
             if(strcmp(Temp_Username,temp->user_name)==0)
-            {
-                puts(temp->user_name);
-                puts(temp->password);
                 strcpy(Confirm_Old_Password,temp->password);
-            }
             temp=temp->next;
         }
         temp=head;
@@ -1471,6 +1607,25 @@ void Change_Password()
     }while(strcmp(Old_Password,Confirm_Old_Password)!=0);
     printf("\n\nEnter new password: ");
     Enter_Pass(New_Password);
+    do
+    {
+        Int_Temp=Password_Check(New_Password);
+        if(Int_Temp==-1)
+        {
+            printf("\n\nYour password is too short.\nEnter a longer password: ");
+            Enter_Pass(New_Password);
+        }
+        if(Int_Temp==-2)
+        {
+            printf("\n\nYour password is too long.\nEnter a shorter password: ");
+            Enter_Pass(New_Password);
+        }
+        if(Int_Temp==-3)
+        {
+            printf("\n\nYour password is weak\nEnter a stronger password (according to notes): ");
+            Enter_Pass(New_Password);
+        }
+    }while(Int_Temp!=0);
     printf("\nRepeat new password: ");
     Enter_Pass(Repeat_New_Password);
     do
@@ -1507,7 +1662,7 @@ void Change_Password()
 void Change_Username()
 {
     system("cls");
-    char New_Username[30],Temp_Username[30],Old_Directory[80],New_Directory[80];
+    char New_Username[30],Temp_Username[30],Old_Directory[80],New_Directory[80],Int_Temp=0;
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -1515,6 +1670,25 @@ void Change_Username()
     FILE *profile;
     printf("\n\n\nEnter new user name: ");
     gets(New_Username);
+    do
+    {
+        Int_Temp=User_Name_Check(New_Username);
+        if(Int_Temp==-1)
+        {
+            printf("\n\nUser name is too short.\nEnter a longer user name: ");
+            gets(New_Username);
+        }
+        else if(Int_Temp==-2)
+        {
+            printf("\n\nUser name is too long.\nEnter a shorter user name: ");
+            gets(New_Username);
+        }
+        else if(Int_Temp==-3)
+        {
+            printf("\n\nThere's another user with this user name.\nEnter another user name: ");
+            gets(New_Username);
+        }
+    }while(Int_Temp!=0);
     strcpy(Old_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
     strcat(Old_Directory,g_username);
     strcat(Old_Directory,".txt");
