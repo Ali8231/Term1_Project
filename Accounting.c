@@ -8,13 +8,13 @@
 
 struct UserProfile
 {
-    char name[30];
-    char family[30];
-    char user_name[30];
-    char password[30];
-    char Melli_Num[20];
-    char Phone_Num[20];
-    char Email[50];
+    char name[28];
+    char family[28];
+    char user_name[18];
+    char password[24];
+    char Melli_Num[14];
+    char Phone_Num[15];
+    char Email[53];
     struct UserProfile *next;
 };
 
@@ -26,7 +26,7 @@ struct UserIncome
    char Year[7];
    char Month[5];
    char Day[5];
-   char description[110];
+   char description[103];
    struct UserIncome *next;
 };
 
@@ -37,20 +37,20 @@ struct UserExpense
    char Year[7];
    char Month[5];
    char Day[5];
-   char description[110];
+   char description[103];
    struct UserExpense *next;
 };
 
 
 struct PassLimit
 {
-    char username[21];
-    char Time_Of_Limit[12];
+    char username[18];
+    char Time_Of_Ban[13];
     struct PassLimit *next;
 };
 
 
-char g_username[20];
+char g_username[16];
 
 
 void Check_Pass_Enter_Limit(char *username);
@@ -66,14 +66,49 @@ void Entrance_Menu();
 void Signup();
 void Login();
 int User_Name_Search();
-int Login_Pass_Check(int password[]);
+int Login_Pass_Check(char *password);
 void Main_Menu();
 int Profile_Iteration();
 void Enter_Pass(char *password);
 void Submit_Expense();
 void Reports();
 void Input_Time_Period(char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day);
-int Check_Time_Period(int Year[],int Month[],int Day[],int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[]);
+int Check_Time_Period(char *Year,char *Month,char *Day,char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day);
+void Exit();
+void Pass_Enter_Limit();
+void Income_Reports();
+void Income_Search_In_Description();
+void Highest_Income_In_Time_Period();
+void Detailed_Incomes_In_Time_Period();
+void Incomes_Share_Ratio_In_Time_Period();
+void Incomes_Share_Ratio();
+void Specific_Income_In_Time_Period();
+void Income_In_Time_Period();
+void Annual_Income();
+void Account_Balance();
+void Expense_Reports();
+void Annual_Expense();
+void Expense_In_Time_Period();
+void Specific_Expense_In_Time_Period();
+void Expense_Share_Ratio();
+void Expense_Share_Ratio_In_Time_Period();
+void Detailed_Expense_In_Time_Period();
+void Highest_Expense_In_Time_Period();
+void Expense_Search_In_Description();
+void Settings();
+void Change_Email();
+void Change_Phone_Number();
+void Change_Password();
+void Change_Username();
+int Pass_Limit_File_Iteration();
+int Profile_Iteration();
+int Income_Iteration();
+int Expense_Iteration();
+void Return_To_Menu_For_Settings();
+void Return_To_Menu_For_Reports();
+int Date_Check(char *Year,char *Month,char *Day);
+int Check_Year_For_Annual_Statement(char *Year);
+int Money_Amount_Check(char *Amount);
 
 
 void main()
@@ -113,7 +148,7 @@ void Exit()
 void Signup()
 {
     system("cls");
-    char name[20],family[25],user_name[20],password[21],Confirm_Pass[21],Melli_Num[12],Phone_Num[13],Email[40];
+    char name[25],family[25],user_name[16],password[21],Confirm_Pass[21],Melli_Num[12],Phone_Num[13],Email[50];
     int temp;
     FILE *profile,*UserIncome,*UserExpense;
     profile=fopen("profile.txt","a");
@@ -277,7 +312,7 @@ void Code_Password(char *password)
 int Email_Check(char *Email)
 {
     int i=0,At_Sign_Check=0,Dot_Check=0;
-    char Temp_Email[42];
+    char Temp_Email[52];
     FILE *profile;
     profile=fopen("profile.txt","r");
     struct UserProfile *head,*temp;
@@ -397,7 +432,7 @@ int Password_Check(char *password)
 
 int User_Name_Check(char *username)
 {
-    char Temp_Username[20];
+    char Temp_Username[16];
     FILE *profile;
     profile=fopen("profile.txt","r");
     struct UserProfile *head,*temp;
@@ -446,13 +481,15 @@ void Enter_Pass(char *password)
 
 void Login()
 {
-    int User_Name_Found,Pass_Found,Times_Pass_Entered=1,Size_Of_File;
+    int User_Name_Found,Pass_Found,Times_Pass_Entered=1,Size_Of_File=0;
     char password[21];
     FILE *Pass_Limit;
     Pass_Limit=fopen("PassLimit.txt","r");
-    fseek(Pass_Limit,0,SEEK_END);
-    Size_Of_File=ftell(Pass_Limit);
-    fclose(Pass_Limit);
+    if(Pass_Limit!=NULL)
+    {
+        fseek(Pass_Limit,0,SEEK_END);
+        Size_Of_File=ftell(Pass_Limit);
+    }
     system("cls");
     printf("-----LOGIN PAGE-----\n\n\nEnter your user name: ");
     gets(g_username);
@@ -465,8 +502,11 @@ void Login()
             gets(g_username);
         }
     }while(User_Name_Found==-1);
-    if(Size_Of_File>0)
+    if(Pass_Limit!=NULL && Size_Of_File>0)
+    {
+        fclose(Pass_Limit);
         Check_Pass_Enter_Limit(g_username);
+    }
     printf("Enter your password: ");
     Enter_Pass(password);
     Code_Password(password);
@@ -489,10 +529,10 @@ void Login()
 void Check_Pass_Enter_Limit(char *username)
 {
     FILE *Pass_Limit;
-    char temp_username[25];
+    char temp_username[16];
     char *end;
     int Remaining_Time;
-    long Int_Time_Of_Limit;
+    long Int_Time_Of_Ban;
     struct PassLimit *head,*temp;
     head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
     head=Pass_Limit_File_Iteration();
@@ -503,14 +543,14 @@ void Check_Pass_Enter_Limit(char *username)
     {
         if(strcmp(temp->username,temp_username)==0)
         {
-            Int_Time_Of_Limit=strtol(temp->Time_Of_Limit,&end,10);
-            if( (time(NULL)-Int_Time_Of_Limit) < 300)
+            Int_Time_Of_Ban=strtol(temp->Time_Of_Ban,&end,10);
+            if( (time(NULL)-Int_Time_Of_Ban) < 300)
             {
                 system("cls");
-                Remaining_Time=(300 - (time(NULL)-Int_Time_Of_Limit))/60 + 1;
+                Remaining_Time=(300 - (time(NULL)-Int_Time_Of_Ban))/60 + 1;
                 printf("\n\n\nYou have entered 5 incorrect passwords before.\n");
                 printf("You can try again in %d minutes",Remaining_Time);
-                while(time(NULL)-Int_Time_Of_Limit<=300)
+                while(time(NULL)-Int_Time_Of_Ban<=300)
                     sleep(1);
                 Pass_Limit=fopen("PassLimit.txt","w");
                 temp=head;
@@ -524,7 +564,7 @@ void Check_Pass_Enter_Limit(char *username)
                     else
                     {
                         fputs(temp->username,Pass_Limit);
-                        fputs(temp->Time_Of_Limit,Pass_Limit);
+                        fputs(temp->Time_Of_Ban,Pass_Limit);
                     }
                     temp=temp->next;
                 }
@@ -533,10 +573,29 @@ void Check_Pass_Enter_Limit(char *username)
                 break;
             }
             else
+            {
+                Pass_Limit=fopen("PassLimit.txt","w");
+                temp=head;
+                while(temp->next!=NULL)
+                {
+                    if(strcmp(temp->username,temp_username)==0)
+                    {
+                        temp=temp->next;
+                        continue;
+                    }
+                    else
+                    {
+                        fputs(temp->username,Pass_Limit);
+                        fputs(temp->Time_Of_Ban,Pass_Limit);
+                    }
+                    temp=temp->next;
+                }
+                fclose(Pass_Limit);
                 break;
+            }
+
         }
-        else
-            temp=temp->next;
+        temp=temp->next;
     }
 }
 
@@ -544,9 +603,8 @@ void Check_Pass_Enter_Limit(char *username)
 void Pass_Enter_Limit()
 {
     system("cls");
-    int minute_count=5,second_count=0;
     long Current_Time;
-    char char_current_time[12],temp_username[25];
+    char char_current_time[12],temp_username[16];
     Current_Time=time(NULL);
     FILE *Pass_Limit;
     Pass_Limit=fopen("PassLimit.txt","a");
@@ -574,7 +632,7 @@ void Pass_Enter_Limit()
         else
         {
             fputs(temp->username,Pass_Limit);
-            fputs(temp->Time_Of_Limit,Pass_Limit);
+            fputs(temp->Time_Of_Ban,Pass_Limit);
         }
         temp=temp->next;
     }
@@ -584,7 +642,7 @@ void Pass_Enter_Limit()
 
 int User_Name_Search()
 {
-    char temp_Username[25];
+    char temp_Username[16];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -601,9 +659,9 @@ int User_Name_Search()
 }
 
 
-int Login_Pass_Check(int password[])
+int Login_Pass_Check(char *password)
 {
-    char temp_Username[25],temp_Password[25];
+    char temp_Username[16],temp_Password[21];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -670,7 +728,7 @@ void Main_Menu()
 void Submit_Income()
 {
     system("cls");
-    char After_Submit_Choice,Incomes_Directory[50],Income_Amount[20],Choose_Source,Source_Of_Income[30],Year_Of_Income[6],Month_Of_Income[4];
+    char After_Submit_Choice,Incomes_Directory[70],Income_Amount[20],Choose_Source,Source_Of_Income[30],Year_Of_Income[6],Month_Of_Income[4];
     char Day_Of_Income[4],Income_Description[100];
     int temp;
     FILE *Incomes;
@@ -761,7 +819,7 @@ void Submit_Income()
 void Submit_Expense()
 {
     system("cls");
-    char After_Submit_Choice,Expenses_Directory[50],Expense_Amount[20],Choose_Subject,Subject_Of_Expense[30],Year_Of_Expenditure[6];
+    char After_Submit_Choice,Expenses_Directory[70],Expense_Amount[20],Choose_Subject,Subject_Of_Expense[30],Year_Of_Expenditure[6];
     char Month_Of_Expenditure[4],Day_Of_Expenditure[4],Expense_Description[100];
     int temp;
     FILE *Expenses;
@@ -789,12 +847,36 @@ void Submit_Expense()
     Choose_Subject_Of_Expense(Subject_Of_Expense);
     printf("Please enter year of expenditure in YYYY format: ");
     gets(Year_Of_Expenditure);
-    strcat(Year_Of_Expenditure,"\n");
     printf("Please enter month of expenditure in MM format(without zero): ");
     gets(Month_Of_Expenditure);
-    strcat(Month_Of_Expenditure,"\n");
     printf("Please enter day of expenditure in DD format(without zero): ");
     gets(Day_Of_Expenditure);
+    do
+      {
+        temp=Date_Check(Year_Of_Expenditure,Month_Of_Expenditure,Day_Of_Expenditure);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.Date must be entered in numbers.\n\n");
+            printf("Please enter year of expenditure in YYYY format: ");
+            gets(Year_Of_Expenditure);
+            printf("Please enter month of expenditure in MM format(without zero): ");
+            gets(Month_Of_Expenditure);
+            printf("Please enter day of expenditure in DD format(without zero): ");
+            gets(Day_Of_Expenditure);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nDate is not in range.Date should not be further than current date or before 1300\n\n");
+            printf("Please enter year of expenditure in YYYY format: ");
+            gets(Year_Of_Expenditure);
+            printf("Please enter month of expenditure in MM format(without zero): ");
+            gets(Month_Of_Expenditure);
+            printf("Please enter day of expenditure in DD format(without zero): ");
+            gets(Day_Of_Expenditure);
+        }
+    }while(temp!=0);
+    strcat(Year_Of_Expenditure,"\n");
+    strcat(Month_Of_Expenditure,"\n");
     strcat(Day_Of_Expenditure,"\n");
     printf("Please enter a short(one line) description: ");
     gets(Expense_Description);
@@ -1010,9 +1092,32 @@ void Income_Reports()
     }
 }
 
+void Check_If_Income_File_Is_Empty()
+{
+    char Incomes_Directory[70];
+    int Size_Of_File;
+    FILE *Incomes;
+    strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(Incomes_Directory,g_username);
+    strcat(Incomes_Directory,".txt");
+    Incomes=fopen(Incomes_Directory,"r");
+    fseek(Incomes,0,SEEK_END);
+    Size_Of_File=ftell(Incomes);
+    if(Incomes==NULL || Size_Of_File<10)
+    {
+        printf("\n\nYou have not submitted any income");
+        sleep(2);
+        Return_To_Menu_For_Reports();
+    }
+    else
+        fclose(Incomes);
+}
+
+
 void Income_Search_In_Description()
 {
     system("cls");
+    Check_If_Income_File_Is_Empty();
     struct UserIncome *head,*Income_Temp;
     head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
     head=Income_Iteration();
@@ -1295,7 +1400,7 @@ void Annual_Income()
     system("cls");
     struct UserIncome *head,*Income_Temp;
     int temp=0;
-    char Year[6];
+    char Year[5];
     char *end;
     long long int Income_Count=0;
     head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
@@ -1430,7 +1535,7 @@ void Annual_Expense()
     system("cls");
     struct UserExpense *head,*Expense_Temp;
     int temp=0;
-    char Year[6];
+    char Year[5];
     char *end;
     long long int Expense_Count=0;
     head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
@@ -1819,7 +1924,7 @@ void Change_Email()
 {
     system("cls");
     int Int_Temp=0;
-    char New_Email[50],Temp_Username[30];
+    char New_Email[51],Temp_Username[16];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -1869,7 +1974,7 @@ void Change_Phone_Number()
 {
     system("cls");
     int Int_Temp=0;
-    char New_Phone_Num[20],Temp_Username[30];
+    char New_Phone_Num[12],Temp_Username[16];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -1918,7 +2023,7 @@ void Change_Password()
 {
     system("cls");
     int Int_Temp=0;
-    char New_Password[30],Old_Password[30],Confirm_Old_Password[30],Repeat_New_Password[30],Temp_Username[30],Temp_Password[30];
+    char New_Password[21],Old_Password[21],Confirm_Old_Password[21],Repeat_New_Password[21],Temp_Username[16],Temp_Password[21];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -2005,7 +2110,7 @@ void Change_Password()
 void Change_Username()
 {
     system("cls");
-    char New_Username[30],Temp_Username[30],Old_Directory[80],New_Directory[80],Int_Temp=0;
+    char New_Username[16],Temp_Username[16],Old_Directory[70],New_Directory[70],Int_Temp=0;
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
     head=Profile_Iteration();
@@ -2064,6 +2169,8 @@ void Change_Username()
         fputs(temp->Email,profile);
         temp=temp->next;
     }
+    New_Username[strlen(New_Username)-1]='\0';
+    strcpy(g_username,New_Username);
     fclose(profile);
     Return_To_Menu_For_Settings();
 }
@@ -2078,7 +2185,7 @@ int Pass_Limit_File_Iteration()
         head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
     }while(head==NULL);
     fgets(head->username,sizeof head->username,Pass_Limit);
-    fgets(head->Time_Of_Limit,sizeof head->Time_Of_Limit,Pass_Limit);
+    fgets(head->Time_Of_Ban,sizeof head->Time_Of_Ban,Pass_Limit);
     head->next=NULL;
     temp=head;
     while(feof(Pass_Limit)==0)
@@ -2088,7 +2195,7 @@ int Pass_Limit_File_Iteration()
             user_limit=(struct PassLimit*)malloc(sizeof(struct PassLimit));
         }while(user_limit==NULL);
         fgets(user_limit->username,sizeof user_limit->username,Pass_Limit);
-        fgets(user_limit->Time_Of_Limit,sizeof user_limit->Time_Of_Limit,Pass_Limit);
+        fgets(user_limit->Time_Of_Ban,sizeof user_limit->Time_Of_Ban,Pass_Limit);
         user_limit->next=NULL;
         temp->next=user_limit;
         temp=user_limit;
@@ -2221,7 +2328,7 @@ int Expense_Iteration()
 }
 
 
-int Check_Time_Period(int Year[],int Month[],int Day[],int Begin_Year[],int Begin_Month[],int Begin_Day[],int End_Year[],int End_Month[],int End_Day[])
+int Check_Time_Period(char *Year,char *Month,char *Day,char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day)
 {
     char *end;
     if(strtoul(Year,&end,10)>=strtoul(Begin_Year,&end,10)  &&   strtoul(Year,&end,10)<=strtoul(End_Year,&end,10))
@@ -2351,7 +2458,7 @@ void Return_To_Menu_For_Reports()
              Exit();
 }
 
-void Choose_Source_Of_Income(int Source_Of_Income[])
+void Choose_Source_Of_Income(char *Source_Of_Income)
 {
     char Choose_Source;
     int temp;
@@ -2403,7 +2510,7 @@ void Choose_Source_Of_Income(int Source_Of_Income[])
    }
 }
 
-void Choose_Subject_Of_Expense(int Subject_Of_Expense[])
+void Choose_Subject_Of_Expense(char *Subject_Of_Expense)
 {
     char Choose_Subject;
     int temp;
