@@ -44,6 +44,7 @@ struct UserExpense
 
 char g_username[20];
 
+void Code_Password(char *password);
 int Check_Year_For_Annual_Statement(char *Year);
 int Email_Check(char *Email);
 int Phone_Num_Check(char *Phone_Num);
@@ -170,6 +171,7 @@ void Signup()
            Enter_Pass(Confirm_Pass);
        }
     }while(strcmp(password,Confirm_Pass)!=0);
+    Code_Password(password);
     strcat(password,"\n");
     printf("\nEnter your Melli number: ");
     gets(Melli_Num);
@@ -235,6 +237,32 @@ void Signup()
     sleep(1);
     Entrance_Menu();
 }
+
+void Code_Password(char *password)
+{
+    int i=0,pass_temp,fibo_temp,fibo_last=0,fibo_cur=1,triangle_num=1,triangle_dots=0,even_or_odd=0,divide_value=1;
+    for(i=0;i<strlen(password);i++)
+    {
+        pass_temp=password[i];
+        if(even_or_odd==0)
+        {
+            fibo_temp=fibo_cur;
+            fibo_cur+=fibo_last;
+            password[i]=(pass_temp + fibo_cur) - ((triangle_dots-triangle_num) + divide_value);
+            fibo_last=fibo_temp;
+            even_or_odd++;
+        }
+        else
+        {
+            triangle_dots=(triangle_num * (triangle_num + 1))/2;
+            password[i]=(pass_temp + triangle_dots) + ((fibo_last+fibo_cur)/(divide_value));
+            triangle_num++;
+            divide_value++;
+            even_or_odd--;
+        }
+    }
+}
+
 
 int Email_Check(char *Email)
 {
@@ -424,6 +452,7 @@ void Login()
     }while(User_Name_Found==-1);
     printf("Enter your password: ");
     Enter_Pass(password);
+    Code_Password(password);
     do
     {
         Pass_Found=Login_Pass_Check(password);
@@ -431,6 +460,7 @@ void Login()
         {
             printf("\n\nPassword is not correct.\nPlease enter password again: ");
             Enter_Pass(password);
+            Code_Password(password);
         }
     }while(Pass_Found==-1);
     Main_Menu();
@@ -1781,6 +1811,7 @@ void Change_Password()
     FILE *profile;
     printf("\n\n\nEnter old password: ");
     Enter_Pass(Old_Password);
+    Code_Password(Old_Password);
     strcat(Old_Password,"\n");
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
@@ -1797,6 +1828,7 @@ void Change_Password()
         {
             printf("\nPassword is not correct.\nPlease Enter the old password: ");
             Enter_Pass(Old_Password);
+            Code_Password(Old_Password);
             strcat(Old_Password,"\n");
         }
     }while(strcmp(Old_Password,Confirm_Old_Password)!=0);
@@ -1831,6 +1863,7 @@ void Change_Password()
            Enter_Pass(Repeat_New_Password);
        }
     }while(strcmp(New_Password,Repeat_New_Password)!=0);
+    Code_Password(New_Password);
     strcat(New_Password,"\n");
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
