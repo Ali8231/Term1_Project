@@ -42,8 +42,18 @@ struct UserExpense
 };
 
 
+struct PassLimit
+{
+    char username[21];
+    char Time_Of_Limit[12];
+    struct PassLimit *next;
+};
+
+
 char g_username[20];
 
+
+void Check_Pass_Enter_Limit(char *username);
 void Code_Password(char *password);
 int Check_Year_For_Annual_Statement(char *Year);
 int Email_Check(char *Email);
@@ -436,8 +446,13 @@ void Enter_Pass(char *password)
 
 void Login()
 {
-    int User_Name_Found,Pass_Found;
+    int User_Name_Found,Pass_Found,Times_Pass_Entered=1,Size_Of_File;
     char password[21];
+    FILE *Pass_Limit;
+    Pass_Limit=fopen("PassLimit.txt","r");
+    fseek(Pass_Limit,0,SEEK_END);
+    Size_Of_File=ftell(Pass_Limit);
+    fclose(Pass_Limit);
     system("cls");
     printf("-----LOGIN PAGE-----\n\n\nEnter your user name: ");
     gets(g_username);
@@ -450,6 +465,8 @@ void Login()
             gets(g_username);
         }
     }while(User_Name_Found==-1);
+    if(Size_Of_File>0)
+        Check_Pass_Enter_Limit(g_username);
     printf("Enter your password: ");
     Enter_Pass(password);
     Code_Password(password);
@@ -458,12 +475,110 @@ void Login()
         Pass_Found=Login_Pass_Check(password);
         if(Pass_Found==-1)//password was not found in profile
         {
+            if(Times_Pass_Entered==5)
+                Pass_Enter_Limit();
             printf("\n\nPassword is not correct.\nPlease enter password again: ");
+            Times_Pass_Entered++;
             Enter_Pass(password);
             Code_Password(password);
         }
     }while(Pass_Found==-1);
     Main_Menu();
+}
+
+void Check_Pass_Enter_Limit(char *username)
+{
+    FILE *Pass_Limit;
+    char temp_username[25];
+    char *end;
+    int Remaining_Time;
+    long Int_Time_Of_Limit;
+    struct PassLimit *head,*temp;
+    head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
+    head=Pass_Limit_File_Iteration();
+    temp=head;
+    strcpy(temp_username,username);
+    strcat(temp_username,"\n");
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->username,temp_username)==0)
+        {
+            Int_Time_Of_Limit=strtol(temp->Time_Of_Limit,&end,10);
+            if( (time(NULL)-Int_Time_Of_Limit) < 300)
+            {
+                system("cls");
+                Remaining_Time=(300 - (time(NULL)-Int_Time_Of_Limit))/60 + 1;
+                printf("\n\n\nYou have entered 5 incorrect passwords before.\n");
+                printf("You can try again in %d minutes",Remaining_Time);
+                while(time(NULL)-Int_Time_Of_Limit<=300)
+                    sleep(1);
+                Pass_Limit=fopen("PassLimit.txt","w");
+                temp=head;
+                while(temp->next!=NULL)
+                {
+                    if(strcmp(temp->username,temp_username)==0)
+                    {
+                        temp=temp->next;
+                        continue;
+                    }
+                    else
+                    {
+                        fputs(temp->username,Pass_Limit);
+                        fputs(temp->Time_Of_Limit,Pass_Limit);
+                    }
+                    temp=temp->next;
+                }
+                fclose(Pass_Limit);
+                system("cls");
+                break;
+            }
+            else
+                break;
+        }
+        else
+            temp=temp->next;
+    }
+}
+
+
+void Pass_Enter_Limit()
+{
+    system("cls");
+    int minute_count=5,second_count=0;
+    long Current_Time;
+    char char_current_time[12],temp_username[25];
+    Current_Time=time(NULL);
+    FILE *Pass_Limit;
+    Pass_Limit=fopen("PassLimit.txt","a");
+    ltoa(Current_Time,char_current_time,10);
+    strcpy(temp_username,g_username);
+    strcat(temp_username,"\n");
+    strcat(char_current_time,"\n");
+    fputs(temp_username,Pass_Limit);
+    fputs(char_current_time,Pass_Limit);
+    struct PassLimit *head,*temp;
+    head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
+    head=Pass_Limit_File_Iteration();
+    temp=head;
+    printf("\n\n\nYou have entered password incorrectly for 5 times.\nYou can try again after 5 minutes: \n\n");
+    while(time(NULL)!=Current_Time + 300)
+        sleep(1);
+    Pass_Limit=fopen("PassLimit.txt","w");
+    while(temp->next!=NULL)
+    {
+        if(strcmp(temp->username,temp_username)==0)
+        {
+            temp=temp->next;
+            continue;
+        }
+        else
+        {
+            fputs(temp->username,Pass_Limit);
+            fputs(temp->Time_Of_Limit,Pass_Limit);
+        }
+        temp=temp->next;
+    }
+    Login();
 }
 
 
@@ -1951,6 +2066,35 @@ void Change_Username()
     }
     fclose(profile);
     Return_To_Menu_For_Settings();
+}
+
+int Pass_Limit_File_Iteration()
+{
+    struct PassLimit *head,*user_limit,*temp;
+    FILE *Pass_Limit;
+    Pass_Limit=fopen("PassLimit.txt","r");
+    do
+    {
+        head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
+    }while(head==NULL);
+    fgets(head->username,sizeof head->username,Pass_Limit);
+    fgets(head->Time_Of_Limit,sizeof head->Time_Of_Limit,Pass_Limit);
+    head->next=NULL;
+    temp=head;
+    while(feof(Pass_Limit)==0)
+    {
+        do
+        {
+            user_limit=(struct PassLimit*)malloc(sizeof(struct PassLimit));
+        }while(user_limit==NULL);
+        fgets(user_limit->username,sizeof user_limit->username,Pass_Limit);
+        fgets(user_limit->Time_Of_Limit,sizeof user_limit->Time_Of_Limit,Pass_Limit);
+        user_limit->next=NULL;
+        temp->next=user_limit;
+        temp=user_limit;
+    }
+    fclose(Pass_Limit);
+    return head;
 }
 
 
