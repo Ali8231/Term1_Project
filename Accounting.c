@@ -502,7 +502,7 @@ void Login()
             gets(g_username);
         }
     }while(User_Name_Found==-1);
-    if(Pass_Limit!=NULL && Size_Of_File>0)
+    if(Pass_Limit!=NULL && Size_Of_File>10)
     {
         fclose(Pass_Limit);
         Check_Pass_Enter_Limit(g_username);
@@ -1160,6 +1160,7 @@ void Income_Search_In_Description()
 void Highest_Income_In_Time_Period()
 {
     system("cls");
+    Check_If_Income_File_Is_Empty();
     char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
     char *end;
     int Income_Date;
@@ -1198,6 +1199,7 @@ void Highest_Income_In_Time_Period()
 void Detailed_Incomes_In_Time_Period()
 {
     system("cls");
+    Check_If_Income_File_Is_Empty();
     char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
     char *end;
     int Income_Date,count=1;
@@ -1242,6 +1244,7 @@ void Detailed_Incomes_In_Time_Period()
 void Incomes_Share_Ratio_In_Time_Period()
 {
    system("cls");
+   Check_If_Income_File_Is_Empty();
    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
    long long int Salary_Count=0,Pocket_Count=0,Grant_Count=0,Gov_Aid_Count=0,Loan_Count=0,Interest_Count=0,SUM=0,Others_Count=0;;
@@ -1294,6 +1297,7 @@ void Incomes_Share_Ratio_In_Time_Period()
 void Incomes_Share_Ratio()
 {
    system("cls");
+   Check_If_Income_File_Is_Empty();
    char *end;
    long long int Salary_Count=0,Pocket_Count=0,Grant_Count=0,Gov_Aid_Count=0,Loan_Count=0,Interest_Count=0,SUM=0,Others_Count=0;;
    double Salary_Share=0,Pocket_Share=0,Grant_Share=0,Gov_Aid_Share=0,Loan_Share=0,Interest_Share=0,Others_Share=0;
@@ -1339,6 +1343,7 @@ void Incomes_Share_Ratio()
 void Specific_Income_In_Time_Period()
 {
    system("cls");
+   Check_If_Income_File_Is_Empty();
    struct UserIncome *head,*Income_Temp;
    char Source_Of_Income[30],Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
@@ -1371,6 +1376,7 @@ void Specific_Income_In_Time_Period()
 void Income_In_Time_Period()
 {
    system("cls");
+   Check_If_Income_File_Is_Empty();
    struct UserIncome *head,*Income_Temp;
    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
@@ -1398,6 +1404,7 @@ void Income_In_Time_Period()
 void Annual_Income()
 {
     system("cls");
+    Check_If_Income_File_Is_Empty();
     struct UserIncome *head,*Income_Temp;
     int temp=0;
     char Year[5];
@@ -1434,31 +1441,92 @@ void Annual_Income()
     Return_To_Menu_For_Reports();
 }
 
+int Check_For_Income_And_Expense_Files_In_Account_Balance()
+{
+    int Size_Of_Incomes_File,Size_Of_Expense_File;
+    char File_Directory[70];
+    FILE *Incomes,*Expenses;
+    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(File_Directory,g_username);
+    strcat(File_Directory,".txt");
+    Incomes=fopen(File_Directory,"r");
+    fseek(Incomes,0,SEEK_END);
+    Size_Of_Incomes_File=ftell(Incomes);
+    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(File_Directory,g_username);
+    strcat(File_Directory,".txt");
+    Expenses=fopen(File_Directory,"r");
+    fseek(Expenses,0,SEEK_END);
+    Size_Of_Expense_File=ftell(Expenses);
+    if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses==NULL || Size_Of_Expense_File<10))
+        return 0;
+    else if((Incomes!=NULL && Size_Of_Incomes_File>=10) && (Expenses==NULL || Size_Of_Expense_File<10))
+        return 1;
+    else if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses!=NULL && Size_Of_Expense_File>=10))
+        return 2;
+    else
+        return 3;
+
+}
+
 
 void Account_Balance()
 {
     system("cls");
+    int Files_Status=0;
     long long int Income_Count=0,Expense_Count=0,Balance=0;
     char *end;
     struct UserIncome *Income_Head,*Income_Temp;
     struct UserExpense *Expense_Head, *Expense_Temp;
     Income_Head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
     Expense_Head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
-    Income_Head=Income_Iteration();
-    Expense_Head=Expense_Iteration();
-    Income_Temp=Income_Head;
-    Expense_Temp=Expense_Head;
-    while(Income_Temp->next!=NULL)
+    Files_Status=Check_For_Income_And_Expense_Files_In_Account_Balance();
+    if(Files_Status==0)
     {
-        Income_Count+=strtoull(Income_Temp->amount,&end,10);
-        Income_Temp=Income_Temp->next;
+        printf("\n\nYou have not submitted any income or expense");
+        sleep(2);
+        Return_To_Menu_For_Reports();
     }
-    while(Expense_Temp->next!=NULL)
+    else if(Files_Status==1)
     {
-        Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
-        Expense_Temp=Expense_Temp->next;
+        Income_Head=Income_Iteration();
+        Income_Temp=Income_Head;
+        while(Income_Temp->next!=NULL)
+        {
+            Income_Count+=strtoull(Income_Temp->amount,&end,10);
+            Income_Temp=Income_Temp->next;
+        }
+        Balance=Income_Count;
     }
-    Balance=Income_Count-Expense_Count;
+    else if(Files_Status==2)
+    {
+        Expense_Head=Expense_Iteration();
+        Expense_Temp=Expense_Head;
+        while(Expense_Temp->next!=NULL)
+        {
+            Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
+            Expense_Temp=Expense_Temp->next;
+        }
+        Balance= -(Expense_Count);
+    }
+    else
+    {
+        Income_Head=Income_Iteration();
+        Expense_Head=Expense_Iteration();
+        Income_Temp=Income_Head;
+        Expense_Temp=Expense_Head;
+        while(Income_Temp->next!=NULL)
+        {
+            Income_Count+=strtoull(Income_Temp->amount,&end,10);
+            Income_Temp=Income_Temp->next;
+        }
+        while(Expense_Temp->next!=NULL)
+        {
+            Expense_Count+=strtoull(Expense_Temp->amount,&end,10);
+            Expense_Temp=Expense_Temp->next;
+        }
+        Balance=Income_Count-Expense_Count;
+    }
     printf("\n\nYour account balance is %lld Iranian RIALS\n\nPlease press any button to continue",Balance);
     getch();
     Return_To_Menu_For_Reports();
@@ -1530,9 +1598,31 @@ void Expense_Reports()
     }
 }
 
+void Check_If_Expense_File_Is_Empty()
+{
+    char Expense_Directory[70];
+    int Size_Of_File=0;
+    FILE *Expenses;
+    strcpy(Expense_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(Expense_Directory,g_username);
+    strcat(Expense_Directory,".txt");
+    Expenses=fopen(Expense_Directory,"r");
+    fseek(Expenses,0,SEEK_END);
+    Size_Of_File=ftell(Expenses);
+    if(Expenses==NULL || Size_Of_File<10)
+    {
+        printf("\n\nYou have not submitted any expense");
+        sleep(2);
+        Return_To_Menu_For_Reports();
+    }
+    else
+        fclose(Expenses);
+}
+
 void Annual_Expense()
 {
     system("cls");
+    Check_If_Expense_File_Is_Empty();
     struct UserExpense *head,*Expense_Temp;
     int temp=0;
     char Year[5];
@@ -1573,6 +1663,7 @@ void Annual_Expense()
 void Expense_In_Time_Period()
 {
    system("cls");
+   Check_If_Expense_File_Is_Empty();
    struct UserExpense *head,*Expense_Temp;
    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
@@ -1599,6 +1690,7 @@ void Expense_In_Time_Period()
 void Specific_Expense_In_Time_Period()
 {
    system("cls");
+   Check_If_Expense_File_Is_Empty();
    struct UserExpense *head,*Expense_Temp;
    char Subject_Of_Expense[30],Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
@@ -1630,6 +1722,7 @@ void Specific_Expense_In_Time_Period()
 void Expense_Share_Ratio()
 {
    system("cls");
+   Check_If_Expense_File_Is_Empty();
    char *end;
    long long int Healthcare_Count=0,Food_Count=0,Care_Cleaning_Count=0,Bills_Count=0,Rent_Mortgage_Count=0,Loan_Payment_Count=0,Education_Count=0;
    long long int Transportation_Count=0,Clothing_Count=0,Recreation_Count=0,Charity_Count=0,Others_Count=0,SUM=0;
@@ -1694,6 +1787,7 @@ void Expense_Share_Ratio()
 void Expense_Share_Ratio_In_Time_Period()
 {
    system("cls");
+   Check_If_Expense_File_Is_Empty();
    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
    char *end;
    int Expense_Date;
@@ -1765,6 +1859,7 @@ void Expense_Share_Ratio_In_Time_Period()
 void Detailed_Expense_In_Time_Period()
 {
     system("cls");
+    Check_If_Expense_File_Is_Empty();
     char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
     char *end;
     int Expense_Date,count=1;
@@ -1808,6 +1903,7 @@ void Detailed_Expense_In_Time_Period()
 void Highest_Expense_In_Time_Period()
 {
     system("cls");
+    Check_If_Expense_File_Is_Empty();
     char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
     char *end;
     int Expense_Date;
@@ -1846,6 +1942,7 @@ void Highest_Expense_In_Time_Period()
 void Expense_Search_In_Description()
 {
     system("cls");
+    Check_If_Expense_File_Is_Empty();
     struct UserExpense *head,*Expense_Temp;
     head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
     head=Expense_Iteration();
@@ -1890,14 +1987,14 @@ void Settings()
     system("cls");
     char Choose_Menu;
     int temp;
-    printf("----- SETTINGS MENU -----\n\n\n1) Change user name\n2) Change password\n3) Change phone number\n4) Change Email address\n\n\n");
+    printf("----- SETTINGS MENU -----\n\n\n1) Change user name\n2) Change password\n3) Change phone number\n4) Change Email address\n5) Delete account\n\n\n");
     do
     {
         Choose_Menu=getch();
         if(Choose_Menu==8)
             Main_Menu();
         temp=Choose_Menu-'0';
-    }while(temp<1 || temp>4);
+    }while(temp<1 || temp>5);
     switch(temp)
     {
         case 1:
@@ -1915,10 +2012,104 @@ void Settings()
             Change_Phone_Number();
             break;
         }
+        case 4:
+            {
+                Change_Email();
+                break;
+            }
         default:
-            Change_Email();
+            {
+                system("cls");
+                printf("\n\nAre you sure you want to delete your account?\nAll of your information will be deleted permanently\nThere will be no way back\n\n");
+                printf("1) Yes\n2) No\n");
+                do
+                {
+                    Choose_Menu=getch();
+                    temp=Choose_Menu-'0';
+                }while(temp<1 || temp>2);
+                if(temp==1)
+                    Delete_Account();
+                else
+                    Settings();
+            }
     }
 }
+
+void Delete_Account()
+{
+    int Size_Of_Profile=0,Size_Of_Pass_Limit=0;
+    char Temp_Username[17],File_Directory[70];
+    struct UserProfile *Profile_Head,*Profile_Temp;
+    struct PassLimit *Pass_Limit_Head,*Pass_Limit_Temp;
+    Profile_Head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
+    Profile_Head=Profile_Iteration();
+    Profile_Temp=Profile_Head;
+    Pass_Limit_Head=(struct PassLimit*)malloc(sizeof(struct PassLimit));
+    Pass_Limit_Head=Pass_Limit_File_Iteration();
+    Pass_Limit_Temp=Pass_Limit_Head;
+    FILE *Profile,*Pass_Limit;
+    strcpy(Temp_Username,g_username);
+    strcat(Temp_Username,"\n");
+    Profile=fopen("Profile.txt","w");
+    while(Profile_Temp!=NULL)
+    {
+        if(strcmp(Temp_Username,Profile_Temp->user_name)==0)
+        {
+            Profile_Temp=Profile_Temp->next;
+            continue;
+        }
+        else
+        {
+            fputs(Profile_Temp->name,Profile);
+            fputs(Profile_Temp->family,Profile);
+            fputs(Profile_Temp->user_name,Profile);
+            fputs(Profile_Temp->password,Profile);
+            fputs(Profile_Temp->Melli_Num,Profile);
+            fputs(Profile_Temp->Phone_Num,Profile);
+            fputs(Profile_Temp->Email,Profile);
+        }
+        Profile_Temp=Profile_Temp->next;
+    }
+    Pass_Limit=fopen("PassLimit.txt","w");
+    while(Pass_Limit_Temp!=NULL)
+    {
+        if(strcmp(Temp_Username,Pass_Limit_Temp->username)==0)
+        {
+            Pass_Limit_Temp=Pass_Limit_Temp->next;
+            continue;
+        }
+        else
+        {
+            fputs(Pass_Limit_Temp->username,Pass_Limit);
+            fputs(Pass_Limit_Temp->Time_Of_Ban,Pass_Limit);
+        }
+        Pass_Limit_Temp=Pass_Limit_Temp->next;
+    }
+    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcat(File_Directory,g_username);
+    strcat(File_Directory,".txt");
+    remove(File_Directory);
+    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\expenses\\\\");
+    strcat(File_Directory,g_username);
+    strcat(File_Directory,".txt");
+    remove(File_Directory);
+    fseek(Profile,0,SEEK_END);
+    fseek(Pass_Limit,0,SEEK_END);
+    Size_Of_Profile=ftell(Profile);
+    Size_Of_Pass_Limit=ftell(Pass_Limit);
+    if(Size_Of_Profile<10)
+        remove("Profile.txt");
+    if(Size_Of_Pass_Limit<10)
+        remove("PassLimit.txt");
+    fclose(Profile);
+    fclose(Pass_Limit);
+    g_username[0]='/0';
+    system("cls");
+    printf("\n\nUser deleted successfully");
+    sleep(2);
+    Entrance_Menu();
+}
+
 
 void Change_Email()
 {
@@ -1965,6 +2156,9 @@ void Change_Email()
         temp=temp->next;
     }
     fclose(profile);
+    system("cls");
+    printf("\n\nEmail changed successfully");
+    sleep(2);
     Return_To_Menu_For_Settings();
 }
 
@@ -2015,6 +2209,9 @@ void Change_Phone_Number()
         temp=temp->next;
     }
     fclose(profile);
+    system("cls");
+    printf("\n\nPhone number changed successfully");
+    sleep(2);
     Return_To_Menu_For_Settings();
 }
 
@@ -2103,6 +2300,9 @@ void Change_Password()
         temp=temp->next;
     }
     fclose(profile);
+    system("cls");
+    printf("\n\nPassword changed successfully");
+    sleep(2);
     Return_To_Menu_For_Settings();
 }
 
@@ -2172,6 +2372,9 @@ void Change_Username()
     New_Username[strlen(New_Username)-1]='\0';
     strcpy(g_username,New_Username);
     fclose(profile);
+    system("cls");
+    printf("\n\nUsername changed successfully");
+    sleep(2);
     Return_To_Menu_For_Settings();
 }
 
