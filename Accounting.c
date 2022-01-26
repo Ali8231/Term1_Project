@@ -716,8 +716,20 @@ void Main_Menu()
         }
         case '5':
         {
-            g_username[0]='/0';
-            Entrance_Menu();
+            system("cls");
+            printf("\n\nAre you sure you want to log out?\n\n1) Yes\n2) No\n");
+            do
+            {
+                Main_Menu_Choice=getch();
+                temp=Main_Menu_Choice - '0';
+            }while(temp<1 || temp>2);
+            if(temp==1)
+            {
+                g_username[0]='/0';
+                Entrance_Menu();
+            }
+            else
+                Main_Menu();
             break;
         }
         default:
@@ -2711,6 +2723,8 @@ void Choose_Source_Of_Income(char *Source_Of_Income)
             strcat(Source_Of_Income,"\n");
         }
    }
+   printf("\n\nSource of income : ");
+   puts(Source_Of_Income);
 }
 
 void Choose_Subject_Of_Expense(char *Subject_Of_Expense)
@@ -2794,6 +2808,8 @@ void Choose_Subject_Of_Expense(char *Subject_Of_Expense)
             strcat(Subject_Of_Expense,"\n");
         }
     }
+    printf("\n\nSubject of expense : ");
+    puts(Subject_Of_Expense);
 }
 
 
