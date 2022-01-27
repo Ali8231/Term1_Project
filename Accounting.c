@@ -110,7 +110,7 @@ int Date_Check(char *Year,char *Month,char *Day);
 int Check_Year_For_Annual_Statement(char *Year);
 int Money_Amount_Check(char *Amount);
 int Name_And_Family_Check(char *name);
-
+int Source_And_Subject_Check(char *Source_Or_Subject);
 
 
 void main()
@@ -334,6 +334,11 @@ int Name_And_Family_Check(char *name)
         if((temp<97 || temp>122) && (temp<65 || temp>90))
             return -1;
     }
+    for(i=0;i<=2;i++)
+    {
+        if(name[i]==32)
+            return -1;
+    }
     if(strlen(name)<3)
         return -2;
     else if(strlen(name)>50)
@@ -534,6 +539,8 @@ void Enter_Pass(char *password)
             i--;
             continue;
         }
+        if((temp>=0 && temp<=32) || temp==127)
+            continue;
         password[i]=temp;
         putch('*');
         i++;
@@ -866,6 +873,18 @@ void Submit_Income()
     gets(Income_Description);
     if(strcmp(Income_Description,"")==0)
         strcpy(Income_Description,"None");
+    else
+    {
+       do
+       {
+          temp=Description_Check(Income_Description);
+          if(temp==-1)
+          {
+              printf("\n\nDescription is too long.\n\nEnter description: ");
+              gets(Income_Description);
+          }
+       }while(temp!=0);
+    }
     strcat(Income_Description,"\n");
     fputs(Income_Amount,Incomes);
     fputs(Source_Of_Income,Incomes);
@@ -955,8 +974,20 @@ void Submit_Expense()
     strcat(Day_Of_Expenditure,"\n");
     printf("Please enter a short(one line) description: ");
     gets(Expense_Description);
-    if(strcmp(Expense_Description,"")==0)//if user enters nothing in description part
+    if(strcmp(Expense_Description,"")==0)
         strcpy(Expense_Description,"None");
+    else
+    {
+       do
+       {
+          temp=Description_Check(Expense_Description);
+          if(temp==-1)
+          {
+              printf("\n\nDescription is too long.\n\nEnter a shorter description: ");
+              gets(Expense_Description);
+          }
+       }while(temp!=0);
+    }
     strcat(Expense_Description,"\n");
     fputs(Expense_Amount,Expenses);
     fputs(Subject_Of_Expense,Expenses);
@@ -981,6 +1012,26 @@ void Submit_Expense()
     else
         Main_Menu();
 }
+
+int Description_Check(char *description)
+{
+    int i=0,temp=0,Count_Spaces=0;
+    for(i=0;i<strlen(description);i++)
+    {
+        temp=description[i];
+        if(temp==32)
+            Count_Spaces++;
+    }
+    if(strlen(description)>100)
+        return -1;
+    if(Count_Spaces==strlen(description))
+    {
+        strcpy(description,"None");
+        return 0;
+    }
+    return 0;
+}
+
 
 int Date_Check(char *Year,char *Month,char *Day)
 {
@@ -2736,6 +2787,32 @@ void Return_To_Menu_For_Reports()
              Exit();
 }
 
+int Source_And_Subject_Check(char *Source_Or_Subject)
+{
+    int i=0,temp=0;
+    for(i=0;i<strlen(Source_Or_Subject);i++)
+    {
+        temp=Source_Or_Subject[i];
+        if(temp==32)
+            continue;
+        if((temp<97 || temp>122) && (temp<65 || temp>90))
+            return -1;
+    }
+    for(i=0;i<=2;i++)
+    {
+        if(Source_Or_Subject[i]==32)
+            return -1;
+    }
+    if(strlen(Source_Or_Subject)<3)
+        return -2;
+    else if(strlen(Source_Or_Subject)>30)
+        return -3;
+    else
+        return 0;
+}
+
+
+
 void Choose_Source_Of_Income(char *Source_Of_Income)
 {
     char Choose_Source;
@@ -2783,6 +2860,25 @@ void Choose_Source_Of_Income(char *Source_Of_Income)
         {
             printf("\n\nPlease enter source of Income: ");
             gets(Source_Of_Income);
+            do
+            {
+                temp=Source_And_Subject_Check(Source_Of_Income);
+                if(temp==-1)
+                {
+                    printf("\n\nFormat is not correct.Source must only be in letters\n\nEnter source of income: ");
+                    gets(Source_Of_Income);
+                }
+                else if(temp==-2)
+                {
+                    printf("\n\nSource in too short.\n\nEnter source of income: ");
+                    gets(Source_Of_Income);
+                }
+                else if(temp==-3)
+                {
+                    printf("\n\nSource in too long.\n\nEnter source of income: ");
+                    gets(Source_Of_Income);
+                }
+            }while(temp!=0);
             strcat(Source_Of_Income,"\n");
         }
    }
