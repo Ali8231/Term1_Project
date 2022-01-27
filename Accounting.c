@@ -8,8 +8,8 @@
 
 struct UserProfile
 {
-    char name[28];
-    char family[28];
+    char name[53];
+    char family[53];
     char user_name[18];
     char password[24];
     char Melli_Num[14];
@@ -109,6 +109,8 @@ void Return_To_Menu_For_Reports();
 int Date_Check(char *Year,char *Month,char *Day);
 int Check_Year_For_Annual_Statement(char *Year);
 int Money_Amount_Check(char *Amount);
+int Name_And_Family_Check(char *name);
+
 
 
 void main()
@@ -148,16 +150,54 @@ void Exit()
 void Signup()
 {
     system("cls");
-    char name[25],family[25],user_name[16],password[21],Confirm_Pass[21],Melli_Num[12],Phone_Num[13],Email[50];
+    char name[50],family[50],user_name[16],password[21],Confirm_Pass[21],Melli_Num[12],Phone_Num[13],Email[50];
     int temp;
     FILE *profile,*UserIncome,*UserExpense;
     profile=fopen("profile.txt","a");
     printf("-----SIGN UP PAGE-----\n\n\nEnter your first name: ");
     rewind(profile);
     gets(name);
+    do
+      {
+        temp=Name_And_Family_Check(name);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.\n\nEnter name: ");
+            gets(name);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nName is too short.\n\nEnter name: ");
+            gets(name);
+        }
+        if(temp==-3)
+        {
+            printf("\n\nName is too long.\n\nEnter name: ");
+            gets(name);
+        }
+    }while(temp!=0);
     strcat(name,"\n");
     printf("Enter your last name: ");
     gets(family);
+    do
+      {
+        temp=Name_And_Family_Check(family);
+        if(temp==-1)
+        {
+            printf("\n\nFormat is not correct.\n\nEnter last name: ");
+            gets(family);
+        }
+        if(temp==-2)
+        {
+            printf("\n\nLast name is too short.\n\nEnter last name: ");
+            gets(family);
+        }
+        if(temp==-3)
+        {
+            printf("\n\nName is too long.\n\nEnter name: ");
+            gets(family);
+        }
+    }while(temp!=0);
     strcat(family,"\n");
     printf("\n\nNotes about user name:\n--Your User name must be between 3 and 15 characters\n");
     printf("--Your User name must be unique.");
@@ -279,9 +319,30 @@ void Signup()
     fclose(profile);
     system("cls");
     printf("  User added Successfully");
-    sleep(1);
+    sleep(2);
     Entrance_Menu();
 }
+
+int Name_And_Family_Check(char *name)
+{
+    int i=0,temp=0;
+    for(i=0;i<strlen(name);i++)
+    {
+        temp=name[i];
+        if(temp==32)
+            continue;
+        if((temp<97 || temp>122) && (temp<65 || temp>90))
+            return -1;
+    }
+    if(strlen(name)<3)
+        return -2;
+    else if(strlen(name)>50)
+        return -3;
+    else
+        return 0;
+}
+
+
 
 void Code_Password(char *password)
 {
@@ -311,6 +372,8 @@ void Code_Password(char *password)
 
 int Email_Check(char *Email)
 {
+    if(strlen(Email)<6)
+        return -1;
     int i=0,At_Sign_Check=0,Dot_Check=0;
     char Temp_Email[52];
     FILE *profile;
@@ -2083,7 +2146,7 @@ void Delete_Account()
         Profile_Temp=Profile_Temp->next;
     }
     Pass_Limit=fopen("PassLimit.txt","w");
-    while(Pass_Limit_Temp!=NULL)
+    while(Pass_Limit_Temp->next!=NULL)
     {
         if(strcmp(Temp_Username,Pass_Limit_Temp->username)==0)
         {
