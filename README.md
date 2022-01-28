@@ -1,12 +1,14 @@
---This is an overview on Ali Asiaee project ordered by Dr.Taheri Javan Assistant Professor at IKIU University,Engineering Department,CE section.
+***This is an overview on Ali Asiaee project ordered by Dr.Taheri Javan Assistant Professor at IKIU University,Engineering Department,CE section.
+
+
 --This project is a simple accounting program designed to meet the basic needs of accounting suitable for personal and limited commercial use.
 --Also this is a multi user program so it can provide service to thousands of users.
 --Unfortunately for developers,This in NOT an open source project as ordered by my Professor.But you still can share your Ideas and criticisms
 by sending an email to : aliasiaee304@gmail.com
 
---WARNING : This program is exclusively developed for use in Islamic Republic of Iran and non-Iranian users may find this program difficult to use.
+***WARNING : This program is exclusively developed for use in Islamic Republic of Iran and non-Iranian users may find this program difficult to use.
 
-***Here is a short description on how this program works***
+***Here is a short description on how this program works
 
 --Program is developed in one piece of code
 --On the first run program only includes Accounting.c,Accounting.exe and two folders named incomes and expenses.you can open program with both .c and .exe files,but .exe file is recommended
@@ -20,11 +22,11 @@ by sending an email to : aliasiaee304@gmail.com
 6. Phone Number
 7. Email Address
 
---CAUTION 1: Users passwords are saved coded. 
+**CAUTION 1: Users passwords are saved coded. 
 
---CAUTION 2 : All usernames are unique to prevent unauthorized access.
+**CAUTION 2 : All usernames are unique to prevent unauthorized access.
 
---CAUTION 3 : Every single piece information/data (even Year,Month and Day) is stored line by line for ALL .txt files 
+**CAUTION 3 : Every single piece information/data (even Year,Month and Day) is stored line by line for ALL .txt files 
 
 --In the MAIN MENU user can submit incomes and expenses.
 --Program saves each user's incomes and expenses seperatly.
