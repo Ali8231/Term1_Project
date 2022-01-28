@@ -18,7 +18,6 @@ struct UserProfile
     struct UserProfile *next;
 };
 
-
 struct UserIncome
 {
    char amount[25];
@@ -41,7 +40,6 @@ struct UserExpense
    struct UserExpense *next;
 };
 
-
 struct PassLimit
 {
     char username[18];
@@ -49,9 +47,7 @@ struct PassLimit
     struct PassLimit *next;
 };
 
-
 char g_username[16];
-
 
 void Check_Pass_Enter_Limit(char *username);
 void Code_Password(char *password);
@@ -101,7 +97,6 @@ void Change_Phone_Number();
 void Change_Password();
 void Change_Username();
 int Pass_Limit_File_Iteration();
-int Profile_Iteration();
 int Income_Iteration();
 int Expense_Iteration();
 void Return_To_Menu_For_Settings();
@@ -111,11 +106,16 @@ int Check_Year_For_Annual_Statement(char *Year);
 int Money_Amount_Check(char *Amount);
 int Name_And_Family_Check(char *name);
 int Source_And_Subject_Check(char *Source_Or_Subject);
-
+void Delete_Account();
+int Description_Check(char *description);
+void Check_If_Income_File_Is_Empty();
+void Check_If_Expense_File_Is_Empty();
+int Source_And_Subject_Check(char *Source_Or_Subject);
+int Check_For_Income_And_Expense_Files_In_Account_Balance();
 
 void main()
 {
-    printf("Welcome to Ali Asiaee accounting software");
+    printf("\nWelcome to Ali Asiaee accounting software");
     sleep(2);
     Entrance_Menu();
 }
@@ -142,9 +142,23 @@ void Entrance_Menu()
 void Exit()
 {
     system("cls");
-    printf("Thank you for using this program\nHope to see you again soon!\n\n\n");
-    sleep(2);
-    exit(1);
+    char Choose_Menu;
+    int temp;
+    printf("\nAre you sure you want to exit program?\n\n1) Yes\n2) No");
+    do
+    {
+        Choose_Menu=getch();
+        temp=Choose_Menu-'0';
+    }while(temp<1 || temp>2);
+    if(temp==1)
+    {
+        printf("\n\nThank you for using this program\nHope to see you again soon!\n\n\n");
+        sleep(2);
+        exit(1);
+    }
+    else
+        Main_Menu();
+
 }
 
 void Signup()
@@ -318,7 +332,7 @@ void Signup()
     fputs(Email,profile);
     fclose(profile);
     system("cls");
-    printf("  User added Successfully");
+    printf("  \nUser added Successfully");
     sleep(2);
     Entrance_Menu();
 }
@@ -328,13 +342,13 @@ int Name_And_Family_Check(char *name)
     int i=0,temp=0;
     for(i=0;i<strlen(name);i++)
     {
-        temp=name[i];
-        if(temp==32)
+        temp=name[i];//temp is ascii value of name[i]
+        if(temp==32)//Space
             continue;
-        if((temp<97 || temp>122) && (temp<65 || temp>90))
+        if((temp<97 || temp>122) && (temp<65 || temp>90))//check Upper and Lower case letters
             return -1;
     }
-    for(i=0;i<=2;i++)
+    for(i=0;i<=2;i++)//if any of the first three name chars is Space
     {
         if(name[i]==32)
             return -1;
@@ -351,6 +365,7 @@ int Name_And_Family_Check(char *name)
 
 void Code_Password(char *password)
 {
+    //I used fibonacci and triangle series for coding pass.divide value is to strengthen coding
     int i=0,pass_temp,fibo_temp,fibo_last=0,fibo_cur=1,triangle_num=1,triangle_dots=0,even_or_odd=0,divide_value=1;
     for(i=0;i<strlen(password);i++)
     {
@@ -400,11 +415,11 @@ int Email_Check(char *Email)
     strcat(Temp_Email,"\n");
     while(temp!=NULL)
     {
-        if(strcmp(temp->Email,Temp_Email)==0)
+        if(strcmp(temp->Email,Temp_Email)==0)//if this email is already in system
             return -2;
         temp=temp->next;
     }
-    return 0;
+    return 0;//Email is OK
 }
 
 
@@ -416,25 +431,25 @@ int Phone_Num_Check(char *Phone_Num)
     profile=fopen("profile.txt","r");
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
-    head=Profile_Iteration();
+    head=Profile_Iteration();//this function  stores all data in profile in a linked list and returns head of the list
     temp=head;
     if(strlen(Phone_Num)!=11 || Phone_Num[0]!='0' || Phone_Num[1]!='9')
         return -1;
     for(i=0;i<strlen(Phone_Num);i++)
     {
         Int_Temp=Phone_Num[i];
-        if(Int_Temp<48 || Int_Temp>57)
+        if(Int_Temp<48 || Int_Temp>57)//checks if user has entered only numbers
             return -1;
     }
     strcpy(Temp_Phone_Num,Phone_Num);
-    strcat(Temp_Phone_Num,"\n");
+    strcat(Temp_Phone_Num,"\n");//because all lines in file have \n at the end this concatenates \n to phone number to use for strcmp
     while(temp!=NULL)
     {
-        if(strcmp(temp->Phone_Num,Temp_Phone_Num)==0)
+        if(strcmp(temp->Phone_Num,Temp_Phone_Num)==0)//if this phone number is already in system
             return -2;
         temp=temp->next;
     }
-    return 0;
+    return 0;//Phone number is OK
 }
 
 
@@ -453,7 +468,7 @@ int Melli_Num_Check(char *Melli_Num)
     for(i=0;i<strlen(Melli_Num);i++)
     {
         Int_Temp=Melli_Num[i];
-        if(Int_Temp<48 || Int_Temp>57)
+        if(Int_Temp<48 || Int_Temp>57)//checks if user has entered only numbers
             return -1;
     }
     strcpy(Temp_Melli_Num,Melli_Num);
@@ -464,7 +479,7 @@ int Melli_Num_Check(char *Melli_Num)
             return -2;
         temp=temp->next;
     }
-    return 0;
+    return 0;//Melli number is OK
 }
 
 
@@ -493,9 +508,9 @@ int Password_Check(char *password)
         else if(temp>=97 && temp<=122)//lower case letters
             Lower_Case_Check++;
     }
-    if(Special_Char_Check==0 || Number_Check==0 || Upper_Case_Check==0 || Lower_Case_Check==0)
+    if(Special_Char_Check==0 || Number_Check==0 || Upper_Case_Check==0 || Lower_Case_Check==0)//if any of the required conditions fail
         return -3;
-    return 0;
+    return 0;//Pass is OK
 }
 
 int User_Name_Check(char *username)
@@ -516,7 +531,7 @@ int User_Name_Check(char *username)
     while(temp!=NULL)
     {
         if(strcasecmp(temp->user_name,Temp_Username)==0)
-            return -3;//user name is not unique
+            return -3;//user name is not unique,there's another user with this username
         temp=temp->next;
     }
     fclose(profile);
@@ -529,17 +544,17 @@ void Enter_Pass(char *password)
 {
     char temp;
     int i=0;
-    while((temp=getch())!=13)//until user presses enter
+    while((temp=getch())!=13)//until user presses enter this loop continues
     {
         if(temp==8)//if user presses backspace
         {
-            if(i==0)
+            if(i==0)//if user presses backspace in first char of the pass it will be ignored
                 continue;
-            printf("\b \b");//destructive /b
+            printf("\b \b");//destructive /b.this will remove the last char
             i--;
             continue;
         }
-        if((temp>=0 && temp<=32) || temp==127)
+        if((temp>=0 && temp<=32) || temp==127)//Checks if any of unusual buttons(Tab,Shift,Ctrl,...) is entered and if true ignores it
             continue;
         password[i]=temp;
         putch('*');
@@ -555,40 +570,40 @@ void Login()
     char password[21];
     FILE *Pass_Limit;
     Pass_Limit=fopen("PassLimit.txt","r");
-    if(Pass_Limit!=NULL)
+    if(Pass_Limit!=NULL)//if Pass Limit exists
     {
-        fseek(Pass_Limit,0,SEEK_END);
-        Size_Of_File=ftell(Pass_Limit);
+        fseek(Pass_Limit,0,SEEK_END);//moves pointer to the end of the file
+        Size_Of_File=ftell(Pass_Limit);//size of the whole file
     }
     system("cls");
     printf("-----LOGIN PAGE-----\n\n\nEnter your user name: ");
     gets(g_username);
     do
     {
-        User_Name_Found=User_Name_Search();
+        User_Name_Found=User_Name_Search();//check for user in profile
         if(User_Name_Found==-1)//user was not found in profile
         {
             printf("\nUser name was not found.\nPlease enter your user name again: ");
             gets(g_username);
         }
     }while(User_Name_Found==-1);
-    if(Pass_Limit!=NULL && Size_Of_File>10)
+    if(Pass_Limit!=NULL && Size_Of_File>10)//if file is OK
     {
         fclose(Pass_Limit);
         Check_Pass_Enter_Limit(g_username);
     }
     printf("Enter your password: ");
-    Enter_Pass(password);
-    Code_Password(password);
+    Enter_Pass(password);//here password is entered and shows stars on screen
+    Code_Password(password);//here pass is coded
     do
     {
-        Pass_Found=Login_Pass_Check(password);
+        Pass_Found=Login_Pass_Check(password);//check for pass in profile
         if(Pass_Found==-1)//password was not found in profile
         {
-            if(Times_Pass_Entered==5)
+            if(Times_Pass_Entered==5)//if pass is entered incorrectly for 5 times
                 Pass_Enter_Limit();
             printf("\n\nPassword is not correct.\nPlease enter password again: ");
-            Times_Pass_Entered++;
+            Times_Pass_Entered++;//counts how many times pass is entered incorrectly
             Enter_Pass(password);
             Code_Password(password);
         }
@@ -611,20 +626,20 @@ void Check_Pass_Enter_Limit(char *username)
     strcat(temp_username,"\n");
     while(temp!=NULL)
     {
-        if(strcmp(temp->username,temp_username)==0)
+        if(strcmp(temp->username,temp_username)==0)//if user is found in pass limit file,this means user was banned before
         {
             Int_Time_Of_Ban=strtol(temp->Time_Of_Ban,&end,10);
-            if( (time(NULL)-Int_Time_Of_Ban) < 300)
+            if( (time(NULL)-Int_Time_Of_Ban) < 300)//if less than 5 minutes has passed since time of ban
             {
                 system("cls");
-                Remaining_Time=(300 - (time(NULL)-Int_Time_Of_Ban))/60 + 1;
+                Remaining_Time=(300 - (time(NULL)-Int_Time_Of_Ban))/60 + 1;//how much time has remained until ban is over
                 printf("\n\n\nYou have entered 5 incorrect passwords before.\n");
                 printf("You can try again in %d minutes",Remaining_Time);
-                while(time(NULL)-Int_Time_Of_Ban<=300)
+                while(time(NULL)-Int_Time_Of_Ban<=300)//stops user for the remaining time
                     sleep(1);
-                Pass_Limit=fopen("PassLimit.txt","w");
+                Pass_Limit=fopen("PassLimit.txt","w");//here all data in pass limit file is deleted
                 temp=head;
-                while(temp->next!=NULL)
+                while(temp->next!=NULL)//here the file is filled again but this ban case is deleted
                 {
                     if(strcmp(temp->username,temp_username)==0)
                     {
@@ -642,7 +657,7 @@ void Check_Pass_Enter_Limit(char *username)
                 system("cls");
                 break;
             }
-            else
+            else//More than 5 minutes has passed since time of ban,so the case will be deleted without delay
             {
                 Pass_Limit=fopen("PassLimit.txt","w");
                 temp=head;
@@ -678,7 +693,7 @@ void Pass_Enter_Limit()
     Current_Time=time(NULL);
     FILE *Pass_Limit;
     Pass_Limit=fopen("PassLimit.txt","a");
-    ltoa(Current_Time,char_current_time,10);
+    ltoa(Current_Time,char_current_time,10);//convert long to string
     strcpy(temp_username,g_username);
     strcat(temp_username,"\n");
     strcat(char_current_time,"\n");
@@ -689,10 +704,10 @@ void Pass_Enter_Limit()
     head=Pass_Limit_File_Iteration();
     temp=head;
     printf("\n\n\nYou have entered password incorrectly for 5 times.\nYou can try again after 5 minutes: \n\n");
-    while(time(NULL)!=Current_Time + 300)
+    while(time(NULL)!=Current_Time + 300)//stops user for 5 minutes
         sleep(1);
     Pass_Limit=fopen("PassLimit.txt","w");
-    while(temp->next!=NULL)
+    while(temp->next!=NULL)//deletes this case
     {
         if(strcmp(temp->username,temp_username)==0)
         {
@@ -738,11 +753,11 @@ int Login_Pass_Check(char *password)
     temp=head;
     strcpy(temp_Username,g_username);
     strcpy(temp_Password,password);
-    strcat(temp_Username,"\n");//in file last character of each element is a \n to go to next line.concatenation of \n is to match two strings for strcmp
+    strcat(temp_Username,"\n");
     strcat(temp_Password,"\n");
     while(temp!=NULL)
     {
-        if((strcmp(temp_Username,temp->user_name)==0) && (strcmp(temp_Password,temp->password)==0))
+        if((strcmp(temp_Username,temp->user_name)==0) && (strcmp(temp_Password,temp->password)==0))//if both user name and pass are for this person
             return 0;//pass found in profile
         temp=temp->next;
     }
@@ -814,7 +829,7 @@ void Submit_Income()
     char Day_Of_Income[4],Income_Description[100];
     int temp;
     FILE *Incomes;
-    strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcpy(Incomes_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");//here the exact file directory is obtained
     strcat(Incomes_Directory,g_username);
     strcat(Incomes_Directory,".txt");
     Incomes=fopen(Incomes_Directory,"a");
@@ -822,7 +837,7 @@ void Submit_Income()
     gets(Income_Amount);
     do
       {
-        temp=Money_Amount_Check(Income_Amount);
+        temp=Money_Amount_Check(Income_Amount);//checks if amount is OK
         if(temp==-1)
         {
             printf("\n\nFormat is not correct.Amount must only be in numbers\nEnter Amount: ");
@@ -835,7 +850,7 @@ void Submit_Income()
         }
     }while(temp!=0);
     strcat(Income_Amount,"\n");
-    Choose_Source_Of_Income(Source_Of_Income);
+    Choose_Source_Of_Income(Source_Of_Income);//here user chooses source
     printf("\nPlease note that date must be entered in Iranian calender\n\nPlease enter year of income in YYYY format: ");
     gets(Year_Of_Income);
     printf("Please enter month of income in MM format(without zero): ");
@@ -844,7 +859,7 @@ void Submit_Income()
     gets(Day_Of_Income);
     do
       {
-        temp=Date_Check(Year_Of_Income,Month_Of_Income,Day_Of_Income);
+        temp=Date_Check(Year_Of_Income,Month_Of_Income,Day_Of_Income);//Checks if date is OK
         if(temp==-1)
         {
             printf("\n\nFormat is not correct.Date must be entered in numbers.\n\n");
@@ -871,7 +886,7 @@ void Submit_Income()
     strcat(Day_Of_Income,"\n");
     printf("Please enter a short(one line) description: ");
     gets(Income_Description);
-    if(strcmp(Income_Description,"")==0)
+    if(strcmp(Income_Description,"")==0)//if user presses enter without entering anything
         strcpy(Income_Description,"None");
     else
     {
@@ -939,7 +954,7 @@ void Submit_Expense()
     }while(temp!=0);
     strcat(Expense_Amount,"\n");
     Choose_Subject_Of_Expense(Subject_Of_Expense);
-    printf("Please enter year of expenditure in YYYY format: ");
+    printf("\n\nPlease note that date must be entered in Iranian calender\n\nPlease enter year of expenditure in YYYY format: ");
     gets(Year_Of_Expenditure);
     printf("Please enter month of expenditure in MM format(without zero): ");
     gets(Month_Of_Expenditure);
@@ -1024,7 +1039,7 @@ int Description_Check(char *description)
     }
     if(strlen(description)>100)
         return -1;
-    if(Count_Spaces==strlen(description))
+    if(Count_Spaces==strlen(description))//if user has entered only space
     {
         strcpy(description,"None");
         return 0;
@@ -1044,7 +1059,7 @@ int Date_Check(char *Year,char *Month,char *Day)
         return -1;
     if(strlen(Day)!=1 && strlen(Day)!=2)
         return -1;
-    if(Year[0]=='0' || Month[0]=='0' || Day[0]=='0')
+    if(Year[0]=='0' || Month[0]=='0' || Day[0]=='0')//if user enters 0 for first char
         return -1;
     for(i=0;i<strlen(Year);i++)
     {
@@ -1066,10 +1081,10 @@ int Date_Check(char *Year,char *Month,char *Day)
     }
     if(atoi(Day)>31 || atoi(Month)>12)
         return -1;
-    Current_Year=1348 + (time(NULL)/31536000);
+    Current_Year=1348 + (time(NULL)/31536000);//Here I obtain Tehran time zone
     Current_Month=10 + (time(NULL)%31536000)/2628000;
     Current_Day=((time(NULL)%31536000)%2628000)/86400;
-    if(strtol(Year,&end,10)>=1300  &&   strtol(Year,&end,10)<=Current_Year)
+    if(strtol(Year,&end,10)>=1300  &&   strtol(Year,&end,10)<=Current_Year)//This loop checks if entered time is beyond tomorrow or before 1300
     {
         if(strtol(Year,&end,10)==Current_Year)
         {
@@ -1140,7 +1155,7 @@ void Reports()
     do
     {
         Report_Type_Choice=getch();
-        if(Report_Type_Choice==8)
+        if(Report_Type_Choice==8)//if user presses backsspace
             Main_Menu();
         temp=Report_Type_Choice - '0';
     }while(temp<1 || temp>3);
@@ -1218,7 +1233,7 @@ void Income_Reports()
     }
 }
 
-void Check_If_Income_File_Is_Empty()
+void Check_If_Income_File_Is_Empty()//this function checks if there is an existing income file for user
 {
     char Incomes_Directory[70];
     int Size_Of_File;
@@ -1246,7 +1261,7 @@ void Income_Search_In_Description()
     Check_If_Income_File_Is_Empty();
     struct UserIncome *head,*Income_Temp;
     head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
-    head=Income_Iteration();
+    head=Income_Iteration();//this function will store all data in user's income file in a linked list
     Income_Temp=head;
     char Word_In_Description[100];
     int count=1;
@@ -1255,7 +1270,7 @@ void Income_Search_In_Description()
     system("cls");
     while(Income_Temp->next!=NULL)
     {
-        if(StrStrIA(Income_Temp->description,Word_In_Description)!=NULL)
+        if(StrStrIA(Income_Temp->description,Word_In_Description)!=NULL)//StrStrIA is non case sensitive of strstr
         {
             printf("INCOME #%d\n\n",count);
             Income_Temp->amount[strlen(Income_Temp->amount)-1]='\0';//To delete \n from last character of the string
@@ -1287,7 +1302,8 @@ void Highest_Income_In_Time_Period()
 {
     system("cls");
     Check_If_Income_File_Is_Empty();
-    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4],Year_Of_Income[6],Month_Of_Income[4],Day_Of_Income[4];
+    char Source_Of_Income[32],Income_Description[102];
     char *end;
     int Income_Date;
     long long int Highest_Income=0;
@@ -1295,20 +1311,42 @@ void Highest_Income_In_Time_Period()
     head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
     head=Income_Iteration();
     Income_Temp=head;
-    Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+    Input_Time_Period(Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);//this function receives dates from user
     while(Income_Temp->next!=NULL)
     {
         Income_Date=Check_Time_Period(Income_Temp->Year,Income_Temp->Month,Income_Temp->Day,Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
-        if(Income_Date==0)//if income is in time period
+        if(Income_Date==0)//if income case is in time period
         {
-            if(Highest_Income==0)
+            if(Highest_Income==0)//the first case
             {
                 Highest_Income=strtoull(Income_Temp->amount,&end,10);
+                Income_Temp->source[strlen(Income_Temp->source)-1]='\0';
+                Income_Temp->Year[strlen(Income_Temp->Year)-1]='\0';
+                Income_Temp->Month[strlen(Income_Temp->Month)-1]='\0';
+                Income_Temp->Day[strlen(Income_Temp->Day)-1]='\0';
+                Income_Temp->description[strlen(Income_Temp->description)-1]='\0';
+                strcpy(Source_Of_Income,Income_Temp->source);
+                strcpy(Year_Of_Income,Income_Temp->Year);
+                strcpy(Month_Of_Income,Income_Temp->Month);
+                strcpy(Day_Of_Income,Income_Temp->Day);
+                strcpy(Income_Description,Income_Temp->description);
                 Income_Temp=Income_Temp->next;
                 continue;
             }
             if(strtoull(Income_Temp,&end,10)>Highest_Income)
+            {
                 Highest_Income=strtoull(Income_Temp,&end,10);
+                Income_Temp->source[strlen(Income_Temp->source)-1]='\0';
+                Income_Temp->Year[strlen(Income_Temp->Year)-1]='\0';
+                Income_Temp->Month[strlen(Income_Temp->Month)-1]='\0';
+                Income_Temp->Day[strlen(Income_Temp->Day)-1]='\0';
+                Income_Temp->description[strlen(Income_Temp->description)-1]='\0';
+                strcpy(Source_Of_Income,Income_Temp->source);
+                strcpy(Year_Of_Income,Income_Temp->Year);
+                strcpy(Month_Of_Income,Income_Temp->Month);
+                strcpy(Day_Of_Income,Income_Temp->Day);
+                strcpy(Income_Description,Income_Temp->description);
+            }
         }
         Income_Temp=Income_Temp->next;
     }
@@ -1316,8 +1354,11 @@ void Highest_Income_In_Time_Period()
     if(Highest_Income==0)
         printf("\n\n\nYou have not submitted any income in this time period");
     else
-        printf("\n\n\nYour highest income between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Income);
-    printf(" Iranian RIALS.\n\n\nPress any button to continue");
+    {
+        printf("\n\n\nYour highest income between %s/%s/%s and %s/%s/%s :\n\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+        printf("Amount : %lld\nSource : %s\nDate : %s/%s/%s\nDescription : %s",Highest_Income,Source_Of_Income,Year_Of_Income,Month_Of_Income,Day_Of_Income,Income_Description);
+    }
+    printf("\n\n\nPress any button to continue");
     getch();//waits for user to press a key
     Return_To_Menu_For_Reports();
 }
@@ -1413,8 +1454,8 @@ void Incomes_Share_Ratio_In_Time_Period()
    Others_Share=((double)Others_Count/SUM) * 100;
    system("cls");
    printf("\n\nYour income share ratio between %s/%s/%s and %s/%s/%s :\n\n\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
-   printf("Salary %20.3Lf%%\nPocket Money %14.3Lf%%\nUniversity Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\n",Salary_Share,Pocket_Share,Grant_Share,Gov_Aid_Share);
-   printf("Loan %22.3Lf%%\nBank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Loan_Share,Interest_Share,Others_Share);
+   printf("-->Salary %20.3Lf%%\n-->Pocket Money %14.3Lf%%\n-->University Grant %10.3Lf%%\n-->Government Aid %12.3Lf%%\n",Salary_Share,Pocket_Share,Grant_Share,Gov_Aid_Share);
+   printf("-->Loan %22.3Lf%%\n-->Bank Interest %13.3Lf%%\n-->Other Incomes %13.3Lf%%\n\n\nPress any button to continue",Loan_Share,Interest_Share,Others_Share);
    getch();
    Return_To_Menu_For_Reports();//at the end user can go back to reports menu,main menu or exit
 }
@@ -1458,9 +1499,9 @@ void Incomes_Share_Ratio()
    Interest_Share=((double)Interest_Count/SUM) * 100;
    Others_Share=((double)Others_Count/SUM) * 100;
    system("cls");
-   printf("\n\nYour All time income share ratio :\n\n\nSalary %20.3Lf%%\nPocket Money %14.3Lf%%\n",Salary_Share,Pocket_Share);
-   printf("University Grant %10.3Lf%%\nGovernment Aid %12.3Lf%%\nLoan %22.3Lf%%\n",Grant_Share,Gov_Aid_Share,Loan_Share);
-   printf("Bank Interest %13.3Lf%%\nOther Incomes %13.3Lf%%\n\n\nPress any button to continue",Interest_Share,Others_Share);
+   printf("\n\nYour All time income share ratio :\n\n\n-->Salary %20.3Lf%%\n-->Pocket Money %14.3Lf%%\n",Salary_Share,Pocket_Share);
+   printf("-->University Grant %10.3Lf%%\n-->Government Aid %12.3Lf%%\n-->Loan %22.3Lf%%\n",Grant_Share,Gov_Aid_Share,Loan_Share);
+   printf("-->Bank Interest %13.3Lf%%\n-->Other Incomes %13.3Lf%%\n\n\nPress any button to continue",Interest_Share,Others_Share);
    getch();
    Return_To_Menu_For_Reports();
 }
@@ -1584,13 +1625,13 @@ int Check_For_Income_And_Expense_Files_In_Account_Balance()
     Expenses=fopen(File_Directory,"r");
     fseek(Expenses,0,SEEK_END);
     Size_Of_Expense_File=ftell(Expenses);
-    if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses==NULL || Size_Of_Expense_File<10))
+    if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses==NULL || Size_Of_Expense_File<10))//if none of income or expense files are available
         return 0;
-    else if((Incomes!=NULL && Size_Of_Incomes_File>=10) && (Expenses==NULL || Size_Of_Expense_File<10))
+    else if((Incomes!=NULL && Size_Of_Incomes_File>=10) && (Expenses==NULL || Size_Of_Expense_File<10))//if only income file is availabe
         return 1;
-    else if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses!=NULL && Size_Of_Expense_File>=10))
+    else if((Incomes==NULL || Size_Of_Incomes_File<10) && (Expenses!=NULL && Size_Of_Expense_File>=10))//if only expense file is available
         return 2;
-    else
+    else//both income and expense files are available
         return 3;
 
 }
@@ -1613,7 +1654,7 @@ void Account_Balance()
         sleep(2);
         Return_To_Menu_For_Reports();
     }
-    else if(Files_Status==1)
+    else if(Files_Status==1)//only income file is opened
     {
         Income_Head=Income_Iteration();
         Income_Temp=Income_Head;
@@ -1624,7 +1665,7 @@ void Account_Balance()
         }
         Balance=Income_Count;
     }
-    else if(Files_Status==2)
+    else if(Files_Status==2)//only expense file is opened
     {
         Expense_Head=Expense_Iteration();
         Expense_Temp=Expense_Head;
@@ -2030,7 +2071,8 @@ void Highest_Expense_In_Time_Period()
 {
     system("cls");
     Check_If_Expense_File_Is_Empty();
-    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4];
+    char Begin_Year[6],End_Year[6],Begin_Month[4],End_Month[4],Begin_Day[4],End_Day[4],Year_Of_Expense[6],Month_Of_Expense[4],Day_Of_Expense[4];
+    char Subject_Of_Expense[32],Expense_Description[102];
     char *end;
     int Expense_Date;
     long long int Highest_Expense=0;
@@ -2047,11 +2089,33 @@ void Highest_Expense_In_Time_Period()
             if(Highest_Expense==0)
             {
                 Highest_Expense=strtoull(Expense_Temp->amount,&end,10);
+                Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+                Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+                Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+                Expense_Temp->Day[strlen(Expense_Temp->Day)-1]='\0';
+                Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+                strcpy(Subject_Of_Expense,Expense_Temp->subject);
+                strcpy(Year_Of_Expense,Expense_Temp->Year);
+                strcpy(Month_Of_Expense,Expense_Temp->Month);
+                strcpy(Day_Of_Expense,Expense_Temp->Day);
+                strcpy(Expense_Description,Expense_Temp->description);
                 Expense_Temp=Expense_Temp->next;
                 continue;
             }
             if(strtoull(Expense_Temp,&end,10)>Highest_Expense)
+            {
                 Highest_Expense=strtoull(Expense_Temp,&end,10);
+                Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+                Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+                Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+                Expense_Temp->Day[strlen(Expense_Temp->Day)-1]='\0';
+                Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+                strcpy(Subject_Of_Expense,Expense_Temp->subject);
+                strcpy(Year_Of_Expense,Expense_Temp->Year);
+                strcpy(Month_Of_Expense,Expense_Temp->Month);
+                strcpy(Day_Of_Expense,Expense_Temp->Day);
+                strcpy(Expense_Description,Expense_Temp->description);
+            }
         }
         Expense_Temp=Expense_Temp->next;
     }
@@ -2059,8 +2123,11 @@ void Highest_Expense_In_Time_Period()
     if(Highest_Expense==0)
         printf("\n\n\nYou have not submitted any expense in this time period");
     else
-        printf("\n\n\nYour highest expense between %s/%s/%s and %s/%s/%s\nis %lld",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day,Highest_Expense);
-    printf(" Iranian RIALS.\n\n\nPress any button to continue");
+    {
+        printf("\n\n\nYour highest expense between %s/%s/%s and %s/%s/%s :\n\n",Begin_Year,Begin_Month,Begin_Day,End_Year,End_Month,End_Day);
+        printf("Amount : %lld\nSubject : %s\nDate : %s/%s/%s\nDescription : %s",Highest_Expense,Subject_Of_Expense,Year_Of_Expense,Month_Of_Expense,Day_Of_Expense,Expense_Description);
+    }
+    printf("\n\n\nPress any button to continue");
     getch();
     Return_To_Menu_For_Reports();
 }
@@ -2177,7 +2244,7 @@ void Delete_Account()
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
     Profile=fopen("Profile.txt","w");
-    while(Profile_Temp!=NULL)
+    while(Profile_Temp!=NULL)//here the deleted profile in last line will be filled again except the deleted user
     {
         if(strcmp(Temp_Username,Profile_Temp->user_name)==0)
         {
@@ -2197,7 +2264,7 @@ void Delete_Account()
         Profile_Temp=Profile_Temp->next;
     }
     Pass_Limit=fopen("PassLimit.txt","w");
-    while(Pass_Limit_Temp->next!=NULL)
+    while(Pass_Limit_Temp->next!=NULL)//Same as profile for pass limit file
     {
         if(strcmp(Temp_Username,Pass_Limit_Temp->username)==0)
         {
@@ -2211,7 +2278,7 @@ void Delete_Account()
         }
         Pass_Limit_Temp=Pass_Limit_Temp->next;
     }
-    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcpy(File_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");//in lines 2281-2288 I delete user's income and expense files
     strcat(File_Directory,g_username);
     strcat(File_Directory,".txt");
     remove(File_Directory);
@@ -2223,13 +2290,13 @@ void Delete_Account()
     fseek(Pass_Limit,0,SEEK_END);
     Size_Of_Profile=ftell(Profile);
     Size_Of_Pass_Limit=ftell(Pass_Limit);
-    if(Size_Of_Profile<10)
+    if(Size_Of_Profile<10)//here if this deleted account is the only account in profile or pass limit file I delete the files
         remove("Profile.txt");
     if(Size_Of_Pass_Limit<10)
         remove("PassLimit.txt");
     fclose(Profile);
     fclose(Pass_Limit);
-    g_username[0]='/0';
+    g_username[0]='/0';//user name is set to nothing
     system("cls");
     printf("\n\nUser deleted successfully");
     sleep(2);
@@ -2275,7 +2342,7 @@ void Change_Email()
         fputs(temp->password,profile);
         fputs(temp->Melli_Num,profile);
         fputs(temp->Phone_Num,profile);
-        if(strcmp(Temp_Username,temp->user_name)==0)
+        if(strcmp(Temp_Username,temp->user_name)==0)//Here if user name is found in profile I change that user's old email to the new one
             fputs(New_Email,profile);
         else
             fputs(temp->Email,profile);
@@ -2354,7 +2421,7 @@ void Change_Password()
     FILE *profile;
     printf("\n\n\nEnter old password: ");
     Enter_Pass(Old_Password);
-    Code_Password(Old_Password);
+    Code_Password(Old_Password);//Here old password is coded for later use
     strcat(Old_Password,"\n");
     strcpy(Temp_Username,g_username);
     strcat(Temp_Username,"\n");
@@ -2367,7 +2434,7 @@ void Change_Password()
             temp=temp->next;
         }
         temp=head;
-        if(strcmp(Old_Password,Confirm_Old_Password)!=0)
+        if(strcmp(Old_Password,Confirm_Old_Password)!=0)//if user fails to confirm his/her old email
         {
             printf("\nPassword is not correct.\nPlease Enter the old password: ");
             Enter_Pass(Old_Password);
@@ -2400,7 +2467,7 @@ void Change_Password()
     Enter_Pass(Repeat_New_Password);
     do
     {
-       if(strcmp(New_Password,Repeat_New_Password)!=0)
+       if(strcmp(New_Password,Repeat_New_Password)!=0)//if user fails to repeat the new email correctly
        {
            printf("\nPassword is not the same.\nPlease Enter the same password: ");
            Enter_Pass(Repeat_New_Password);
@@ -2463,7 +2530,7 @@ void Change_Username()
             gets(New_Username);
         }
     }while(Int_Temp!=0);
-    strcpy(Old_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
+    strcpy(Old_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");//in lines 2533-2546 name of income and expense files for the user are updated
     strcat(Old_Directory,g_username);
     strcat(Old_Directory,".txt");
     strcpy(New_Directory,"F:\\\\C_Programs\\\\Final_Project\\\\incomes\\\\");
@@ -2495,8 +2562,8 @@ void Change_Username()
         fputs(temp->Email,profile);
         temp=temp->next;
     }
-    New_Username[strlen(New_Username)-1]='\0';
-    strcpy(g_username,New_Username);
+    New_Username[strlen(New_Username)-1]='\0';//delete \n from new user name
+    strcpy(g_username,New_Username);//update global user name
     fclose(profile);
     system("cls");
     printf("\n\nUsername changed successfully");
@@ -2659,7 +2726,7 @@ int Expense_Iteration()
 
 int Check_Time_Period(char *Year,char *Month,char *Day,char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day)
 {
-    char *end;
+    char *end;//This function checks if an income/expense case is in time range entered by user
     if(strtoul(Year,&end,10)>=strtoul(Begin_Year,&end,10)  &&   strtoul(Year,&end,10)<=strtoul(End_Year,&end,10))
        {
             if(strtoul(Year,&end,10)==strtoul(Begin_Year,&end,10))
@@ -2681,13 +2748,13 @@ int Check_Time_Period(char *Year,char *Month,char *Day,char *Begin_Year,char *Be
         }
     else
         return -1;
-    return 0;//income in time period
+    return 0;//income/expense in time period
 }
 
 void Input_Time_Period(char *Begin_Year,char *Begin_Month,char *Begin_Day,char *End_Year,char *End_Month,char *End_Day)
 {
     int temp=0;
-    printf("Enter beginning year in YYYY format: ");
+    printf("\n\nPlease note that date must be entered in Iranian calender\n\nEnter beginning year in YYYY format: ");
     gets(Begin_Year);
     printf("Enter beginning month in MM format (without zero): ");
     gets(Begin_Month);
@@ -2793,9 +2860,9 @@ int Source_And_Subject_Check(char *Source_Or_Subject)
     for(i=0;i<strlen(Source_Or_Subject);i++)
     {
         temp=Source_Or_Subject[i];
-        if(temp==32)
+        if(temp==32)//backspace ignored
             continue;
-        if((temp<97 || temp>122) && (temp<65 || temp>90))
+        if((temp<97 || temp>122) && (temp<65 || temp>90))//if non-letter char is entered
             return -1;
     }
     for(i=0;i<=2;i++)
@@ -2970,5 +3037,6 @@ void Choose_Subject_Of_Expense(char *Subject_Of_Expense)
     printf("\n\nSubject of expense : ");
     puts(Subject_Of_Expense);
 }
+
 
 

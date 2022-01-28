@@ -1,0 +1,48 @@
+150000000
+Stocks from company
+1398
+1
+1
+None
+1000000000000000000
+Nowhere 
+1400
+1
+11
+None
+5000000
+University Grant
+1400
+2
+1
+None
+2000558008915000914
+sTocks
+1400
+1
+31
+Google stocks
+5000789100000985005
+Government Aid
+1400
+1
+29
+None
+4000000000000000
+Country budget
+1400
+1
+15
+None
+995000000000000
+Bank Interest
+1400
+1
+20
+None
+900000000000000000
+Loan
+1400
+1
+16
+None
