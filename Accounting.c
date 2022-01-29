@@ -112,6 +112,9 @@ void Check_If_Income_File_Is_Empty();
 void Check_If_Expense_File_Is_Empty();
 int Source_And_Subject_Check(char *Source_Or_Subject);
 int Check_For_Income_And_Expense_Files_In_Account_Balance();
+void Detailed_Income_Statements_For_All_Time();
+void Detailed_Expense_Statements_For_All_Time();
+void Detailed_Statements_For_All_Time();
 
 void main()
 {
@@ -152,6 +155,7 @@ void Exit()
     }while(temp<1 || temp>2);
     if(temp==1)
     {
+        system("cls");
         printf("\n\nThank you for using this program\nHope to see you again soon!\n\n\n");
         sleep(2);
         exit(1);
@@ -1151,21 +1155,154 @@ void Reports()
     system("cls");
     char Report_Type_Choice;
     int temp;
-    printf("-----  REPORTS MENU  -----\n\n\n1) Account balance\n2) Incomes Reports\n3) Expenses Reports\n");
+    printf("-----  REPORTS MENU  -----\n\n\n1) Account balance\n2) Incomes Reports\n3) Expenses Reports\n4) All submitted statements for All time");
     do
     {
         Report_Type_Choice=getch();
         if(Report_Type_Choice==8)//if user presses backsspace
             Main_Menu();
         temp=Report_Type_Choice - '0';
-    }while(temp<1 || temp>3);
+    }while(temp<1 || temp>4);
     if(Report_Type_Choice=='1')
         Account_Balance();
     else if(Report_Type_Choice=='2')
         Income_Reports();
     else if(Report_Type_Choice=='3')
         Expense_Reports();
+    else
+        Detailed_Statements_For_All_Time();
 }
+
+
+void Detailed_Statements_For_All_Time()
+{
+    system("cls");
+    int Files_Status=0,count=1;
+    struct UserIncome *Income_Head, *Income_Temp;
+    struct UserExpense *Expense_Head, *Expense_Temp;
+    Income_Head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    Expense_Head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    Files_Status=Check_For_Income_And_Expense_Files();
+    if(Files_Status==0)
+    {
+        printf("\n\nYou have not submitted any income or expense");
+        sleep(2);
+        Return_To_Menu_For_Reports();
+    }
+    else if(Files_Status==1)//only income file is opened
+    {
+        Income_Head=Income_Iteration();
+        Income_Temp=Income_Head;
+        while(Income_Temp->next!=NULL)
+        {
+            printf("INCOME #%d\n\n",count);
+            Income_Temp->amount[strlen(Income_Temp->amount)-1]='\0';
+            printf("Amount = ",Income_Temp->amount);
+            puts(Income_Temp->amount);
+            Income_Temp->source[strlen(Income_Temp->source)-1]='\0';
+            printf("Source : ");
+            puts(Income_Temp->source);
+            Income_Temp->Year[strlen(Income_Temp->Year)-1]='\0';
+            Income_Temp->Month[strlen(Income_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Income_Temp->Year,Income_Temp->Month,Income_Temp->Day);
+            Income_Temp->description[strlen(Income_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Income_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Income_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+            Income_Temp=Income_Temp->next;
+        }
+
+    }
+    else if(Files_Status==2)//only expense file is opened
+    {
+        Expense_Head=Expense_Iteration();
+        Expense_Temp=Expense_Head;
+        while(Expense_Temp->next!=NULL)
+        {
+            printf("EXPENSE #%d\n\n",count);
+            Expense_Temp->amount[strlen(Expense_Temp->amount)-1]='\0';
+            printf("Amount = ",Expense_Temp->amount);
+            puts(Expense_Temp->amount);
+            Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+            printf("Subject : ");
+            puts(Expense_Temp->subject);
+            Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+            Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day);
+            Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Expense_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Expense_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+            Expense_Temp=Expense_Temp->next;
+        }
+    }
+    else
+    {
+        Income_Head=Income_Iteration();
+        Expense_Head=Expense_Iteration();
+        Income_Temp=Income_Head;
+        Expense_Temp=Expense_Head;
+        Income_Head=Income_Iteration();
+        Income_Temp=Income_Head;
+        while(Income_Temp->next!=NULL)
+        {
+            printf("INCOME #%d\n\n",count);
+            Income_Temp->amount[strlen(Income_Temp->amount)-1]='\0';
+            printf("Amount = ",Income_Temp->amount);
+            puts(Income_Temp->amount);
+            Income_Temp->source[strlen(Income_Temp->source)-1]='\0';
+            printf("Source : ");
+            puts(Income_Temp->source);
+            Income_Temp->Year[strlen(Income_Temp->Year)-1]='\0';
+            Income_Temp->Month[strlen(Income_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Income_Temp->Year,Income_Temp->Month,Income_Temp->Day);
+            Income_Temp->description[strlen(Income_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Income_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Income_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+            Income_Temp=Income_Temp->next;
+        }
+        count=1;
+        while(Expense_Temp->next!=NULL)
+        {
+            printf("EXPENSE #%d\n\n",count);
+            Expense_Temp->amount[strlen(Expense_Temp->amount)-1]='\0';
+            printf("Amount = ",Expense_Temp->amount);
+            puts(Expense_Temp->amount);
+            Expense_Temp->subject[strlen(Expense_Temp->subject)-1]='\0';
+            printf("Subject : ");
+            puts(Expense_Temp->subject);
+            Expense_Temp->Year[strlen(Expense_Temp->Year)-1]='\0';
+            Expense_Temp->Month[strlen(Expense_Temp->Month)-1]='\0';
+            printf("Date : %s/%s/%s",Expense_Temp->Year,Expense_Temp->Month,Expense_Temp->Day);
+            Expense_Temp->description[strlen(Expense_Temp->description)-1]='\0';
+            printf("Description : ");
+            if(strcmp(Expense_Temp->description,"")==0)
+                printf("None");
+            else
+                puts(Expense_Temp->description);
+            count++;
+            printf("\n\n\n\n\n");
+            Expense_Temp=Expense_Temp->next;
+        }
+    }
+    printf("Please press any button to continue\n");
+    getch();
+    Return_To_Menu_For_Reports();
+}
+
 
 void Income_Reports()
 {
@@ -1174,14 +1311,14 @@ void Income_Reports()
     int temp;
     printf("-----  INCOME REPORTS  -----\n\n\nPlease choose report type from the list: \n\n\n1) Annual income statement\n");
     printf("2) Income statement for a time period\n3) Specific income statement for a time period\n4) Incomes share ratio\n");
-    printf("5) Detailed income statement for a time period\n6) Highest income in a time period\n7) Search in descriptions");
+    printf("5) Detailed income statement for a time period\n6) Highest income in a time period\n7) Search in descriptions\n8) Detailed income statement for All time");
     do
     {
         Income_Report_Type=getch();
         if(Income_Report_Type==8)
             Reports();
         temp=Income_Report_Type-'0';
-    }while(temp<1 || temp>7);
+    }while(temp<1 || temp>8);
     switch(Income_Report_Type)
     {
         case '1':
@@ -1226,12 +1363,56 @@ void Income_Reports()
             Highest_Income_In_Time_Period();
             break;
         }
-        default:
+        case '7':
         {
             Income_Search_In_Description();
         }
+        default:
+        {
+             Detailed_Income_Statements_For_All_Time();
+        }
     }
 }
+
+
+void Detailed_Income_Statements_For_All_Time()
+{
+    system("cls");
+    Check_If_Income_File_Is_Empty();
+    int Count=1;
+    struct UserIncome *head,*temp;
+    head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
+    head=Income_Iteration();
+    temp=head;
+    while(temp->next!=NULL)
+    {
+        printf("INCOME #%d\n\n",Count);
+        temp->amount[strlen(temp->amount)-1]='\0';
+        printf("Amount = ",temp->amount);
+        puts(temp->amount);
+        temp->source[strlen(temp->source)-1]='\0';
+        printf("Source : ");
+        puts(temp->source);
+        temp->Year[strlen(temp->Year)-1]='\0';
+        temp->Month[strlen(temp->Month)-1]='\0';
+        printf("Date : %s/%s/%s",temp->Year,temp->Month,temp->Day);
+        temp->description[strlen(temp->description)-1]='\0';
+        printf("Description : ");
+        if(strcmp(temp->description,"")==0)
+            printf("None");
+        else
+            puts(temp->description);
+        Count++;
+        printf("\n\n\n\n\n");
+        temp=temp->next;
+    }
+    printf("Enter any button to continue\n");
+    getch();
+    Return_To_Menu_For_Reports();
+
+}
+
+
 
 void Check_If_Income_File_Is_Empty()//this function checks if there is an existing income file for user
 {
@@ -1608,7 +1789,7 @@ void Annual_Income()
     Return_To_Menu_For_Reports();
 }
 
-int Check_For_Income_And_Expense_Files_In_Account_Balance()
+int Check_For_Income_And_Expense_Files()
 {
     int Size_Of_Incomes_File,Size_Of_Expense_File;
     char File_Directory[70];
@@ -1647,7 +1828,7 @@ void Account_Balance()
     struct UserExpense *Expense_Head, *Expense_Temp;
     Income_Head=(struct UserIncome*)malloc(sizeof(struct UserIncome));
     Expense_Head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
-    Files_Status=Check_For_Income_And_Expense_Files_In_Account_Balance();
+    Files_Status=Check_For_Income_And_Expense_Files();
     if(Files_Status==0)
     {
         printf("\n\nYou have not submitted any income or expense");
@@ -1706,14 +1887,14 @@ void Expense_Reports()
     int temp;
     printf("-----  EXPENSE REPORTS  -----\n\n\nPlease choose report type from the list: \n\n\n1) Annual expense statement\n");
     printf("2) Expense statement for a time period\n3) Specific expense statement for a time period\n4) Expense share ratio\n");
-    printf("5) Detailed expense statement for a time period\n6) Highest expense in a time period\n7) Search in descriptions");
+    printf("5) Detailed expense statement for a time period\n6) Highest expense in a time period\n7) Search in descriptions\n8) Detailed Expense statement for All time");
     do
     {
         Expense_Report_Type=getch();
         if(Expense_Report_Type==8)
             Reports();
         temp=Expense_Report_Type-'0';
-    }while(temp<1 || temp>7);
+    }while(temp<1 || temp>8);
     switch(Expense_Report_Type)
     {
         case '1':
@@ -1758,12 +1939,56 @@ void Expense_Reports()
             Highest_Expense_In_Time_Period();
             break;
         }
-        default:
+        case '7':
         {
             Expense_Search_In_Description();
+            break;
+        }
+        default:
+        {
+            Detailed_Expense_Statements_For_All_Time();
         }
     }
 }
+
+void Detailed_Expense_Statements_For_All_Time()
+{
+    system("cls");
+    Check_If_Expense_File_Is_Empty();
+    int Count=1;
+    struct UserExpense *head,*temp;
+    head=(struct UserExpense*)malloc(sizeof(struct UserExpense));
+    head=Expense_Iteration();
+    temp=head;
+    while(temp->next!=NULL)
+    {
+        printf("EXPENSE #%d\n\n",Count);
+        temp->amount[strlen(temp->amount)-1]='\0';
+        printf("Amount = ",temp->amount);
+        puts(temp->amount);
+        temp->subject[strlen(temp->subject)-1]='\0';
+        printf("Subject : ");
+        puts(temp->subject);
+        temp->Year[strlen(temp->Year)-1]='\0';
+        temp->Month[strlen(temp->Month)-1]='\0';
+        printf("Date : %s/%s/%s",temp->Year,temp->Month,temp->Day);
+        temp->description[strlen(temp->description)-1]='\0';
+        printf("Description : ");
+        if(strcmp(temp->description,"")==0)
+            printf("None");
+        else
+            puts(temp->description);
+        Count++;
+        printf("\n\n\n\n\n");
+        temp=temp->next;
+    }
+    printf("Enter any button to continue\n");
+    getch();
+    Return_To_Menu_For_Reports();
+
+}
+
+
 
 void Check_If_Expense_File_Is_Empty()
 {
@@ -2412,7 +2637,7 @@ void Change_Phone_Number()
 void Change_Password()
 {
     system("cls");
-    int Int_Temp=0;
+    int Int_Temp=0,Times_Pass_Entered=1;
     char New_Password[21],Old_Password[21],Confirm_Old_Password[21],Repeat_New_Password[21],Temp_Username[16],Temp_Password[21];
     struct UserProfile *head,*temp;
     head=(struct UserProfile*)malloc(sizeof(struct UserProfile));
@@ -2436,7 +2661,10 @@ void Change_Password()
         temp=head;
         if(strcmp(Old_Password,Confirm_Old_Password)!=0)//if user fails to confirm his/her old email
         {
+            if(Times_Pass_Entered==5)
+                Pass_Enter_Limit();
             printf("\nPassword is not correct.\nPlease Enter the old password: ");
+            Times_Pass_Entered++;
             Enter_Pass(Old_Password);
             Code_Password(Old_Password);
             strcat(Old_Password,"\n");

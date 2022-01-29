@@ -1,0 +1,12 @@
+50000000
+Food
+1400
+2
+8
+None
+150000000
+Recreation
+1400
+11
+9
+Went to vacation
